@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
  ============================================================================
- TICKET-ADV009 — JSONB column on instruments (+ GIN index on Postgres)
+ DONE: TICKET-ADV009 — JSONB column on instruments (+ GIN index on Postgres)
  WHAT:    instruments.metadata as JSONB to hold per-asset-class detail
           (e.g. dividend yield, country, sector).
  HOW:     Postgres-only step; H2 dialect lacks JSONB. The precondition guards
