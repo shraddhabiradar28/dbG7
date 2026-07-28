@@ -44,6 +44,59 @@ WITH RECURSIVE trade_lifecycle AS (
         s.settlement_date::timestamp                  AS at_ts,
         s.status                                      AS detail
     FROM trade_lifecycle tl
+    -- JOIN LATERAL (
+    --     SELECT 
+    --        2 AS Step,
+    --        'CONFIRMATION' AS state,
+    --        c.confirmed_at AS at_ts,
+    --        c.status AS detail
+    --     FROM confirmation c 
+    --     WHERE t1.step = 1
+    --         AND c.trade_id = t1.rade_id
+        
+    --     UNION ALL
+
+    --     SELECT 
+    --         3,
+    --         'SETTLEMENT',
+    --         s.settlement_date,
+    --         s.status
+    --     FROM settlements s
+    --     WHERE t1.step=2
+    --        AND s.trade_id=t1.trade_id
+        
+    --     UNION ALL
+    --     SELECT
+    --       3,
+    --       'SETTLEMENT',
+    --        s.settlement_date,
+    --        s.status
+    --     FROM settlements s
+    --     WHERE t1.step = 2
+    --         AND s.trade_id =t1.trade_id
+
+    --     UNION ALL
+
+    --     SELECT
+    --         4,
+    --         'RECON_BREAK',
+    --         rb.created_at,
+    --         rb.reason
+
+    --     FROM recon_breaks rb
+    --     WHERE t1.step =3
+    --         AND rb.trade_id=t1.trade_id
+
+    --     UNION ALL
+    --     SELECT
+    --         5,
+    --         'RESOLUTION',
+    --         r.resolved_at,
+    --         r.after_state
+    --     FROM resolutions r
+    --     WHERE t1.step =4
+    --         AND r.trade_id=t1.trade_id    
+    -- ) nxt on TRUE
     JOIN settlements s ON s.trade_id = tl.trade_id
     WHERE tl.step < 4
 )
