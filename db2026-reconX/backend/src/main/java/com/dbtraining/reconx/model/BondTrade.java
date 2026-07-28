@@ -7,7 +7,7 @@ import java.util.Objects;
 
 /**
  * ============================================================================
- * TICKET-ADV021 — BondTrade with Builder pattern
+ *          TICKET-ADV021 — BondTrade with Builder pattern
  *
  * WHAT:    Fixed-income trade — couponRate, maturityDate, faceValue, isin.
  * HOW:     Same builder pattern. notional() = faceValue (in the bond's ccy).
@@ -47,7 +47,8 @@ public final class BondTrade implements TradeType {
 
     /** Notional = faceValue in the bond's currency. */
     @Override public Money notional() {
-        // TODO(TICKET-ADV021): return new Money(faceValue, currency).
+        // TODO (TICKET-ADV021)
+        return new Money (faceValue, currency).
         throw new UnsupportedOperationException("TICKET-ADV021");
     }
 
