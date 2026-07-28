@@ -115,7 +115,26 @@ public String toString() {
             //     quantity, price, currency, side, tradeDate).
             //   - quantity and price must be > 0 (IllegalStateException otherwise).
             //   - return new EquityTrade(this).
-            throw new UnsupportedOperationException("TICKET-ADV019");
+
+            Objects.requireNonNull(tradeRef);
+            Objects.requireNonNull(instrumentSymbol);
+            Objects.requireNonNull(quantity);
+            Objects.requireNonNull(price);
+             Objects.requireNonNull(currency);
+            Objects.requireNonNull(side);
+            Objects.requireNonNull(tradeDate);
+            if(quantity.compareTo(BigDecimal.ZERO)<=0){
+                throw new IllegalStateException("quantity must be > 0");
+            }
+
+            if(price.compareTo(BIgDecimal.ZERO)<=0){
+                throw new IllegalStateException("price must be >0");
+            }
+            if(instrumentSymbol.isBlank()){
+                throw new IllegalStateException("instrument symbol must not be blank");
+            }
+            return new EquityTrade(this);
+
         }
     }
 }

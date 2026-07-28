@@ -43,7 +43,13 @@ public record Money(BigDecimal amount, Currency currency) {
     public Money plus(Money other) {
         // TODO(TICKET-ADV024): validate same currency, then return a new Money
         //                     whose amount = this.amount + other.amount.
-        throw new UnsupportedOperationException("TICKET-ADV024");
+        Objects.requireNonNull(other);
+        if(!currency.eqauls(other.currency())){
+            throw new 
+        IllegalArgumentException("Currencies must match");
+        }
+        return new 
+        Money(amount.add(other.amount()),currency);
     }
 
     public Money times(BigDecimal multiplier) {
