@@ -43,6 +43,13 @@ public record Money(BigDecimal amount, Currency currency) {
     public Money plus(Money other) {
         // TODO(TICKET-ADV024): validate same currency, then return a new Money
         //                     whose amount = this.amount + other.amount.
+        Objects.requireNonNull(other);
+        if(!currency.eqauls(other.currency())){
+            throw new 
+        IllegalArgumentException("Currencies must match");
+        }
+        return new 
+        Money(amount.add(other.amount()),currency);
         if (!this.currency.equals(other.currency)) {
             throw new IllegalArgumentException(
                     "Cannot add %s to %s — currency mismatch".formatted(other.currency, this.currency));

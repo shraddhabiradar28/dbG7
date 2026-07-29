@@ -74,12 +74,17 @@ public final class EquityTrade implements TradeType {
         return tradeRef.hashCode();
     }
 
+    // @Override
+    // public String toString() {
+    //     // TODO(TICKET-ADV030): "EquityTrade[ref=..., symbol=..., qty=..., price=... CCY, side=...]"
+    //     //                     — must NOT leak counterparty PII.
+    //     throw new UnsupportedOperationException("TICKET-ADV030");
+    // }
     @Override
-    public String toString() {
-        // TODO(TICKET-ADV030): "EquityTrade[ref=..., symbol=..., qty=..., price=... CCY, side=...]"
-        //                     — must NOT leak counterparty PII.
-        throw new UnsupportedOperationException("TICKET-ADV030");
-    }
+public String toString() {
+    return "EquityTrade[ref=%s, symbol=%s, qty=%s, price=%s %s, side=%s]"
+            .formatted(tradeRef, instrumentSymbol, quantity, price, currency.getCurrencyCode(), side);
+}
 
     /** Fluent builder. Required fields validated in {@link #build()}. */
     public static final class Builder {
@@ -108,7 +113,26 @@ public final class EquityTrade implements TradeType {
             //     quantity, price, currency, side, tradeDate).
             //   - quantity and price must be > 0 (IllegalStateException otherwise).
             //   - return new EquityTrade(this).
-            throw new UnsupportedOperationException("TICKET-ADV019");
+
+            Objects.requireNonNull(tradeRef);
+            Objects.requireNonNull(instrumentSymbol);
+            Objects.requireNonNull(quantity);
+            Objects.requireNonNull(price);
+             Objects.requireNonNull(currency);
+            Objects.requireNonNull(side);
+            Objects.requireNonNull(tradeDate);
+            if(quantity.compareTo(BigDecimal.ZERO)<=0){
+                throw new IllegalStateException("quantity must be > 0");
+            }
+
+            if(price.compareTo(BIgDecimal.ZERO)<=0){
+                throw new IllegalStateException("price must be >0");
+            }
+            if(instrumentSymbol.isBlank()){
+                throw new IllegalStateException("instrument symbol must not be blank");
+            }
+            return new EquityTrade(this);
+
         }
     }
 }
