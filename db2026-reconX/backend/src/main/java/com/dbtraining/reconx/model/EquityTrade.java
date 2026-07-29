@@ -41,6 +41,29 @@ public final class EquityTrade implements TradeType {
     public Side side()               { return side; }
     public long counterpartyId()     { return counterpartyId; }
 
+    /** equals: two EquityTrades are equal iff their tradeRef is equal. */
+    @Override
+    public boolean equals(Object o) {
+        return (o instanceof EquityTrade other) && tradeRef.equals(other.tradeRef);
+    }
+
+    @Override public int hashCode() {
+        return tradeRef.hashCode();
+    }
+
+    // @Override
+    // public String toString() {
+    //     // TODO(TICKET-ADV030): "EquityTrade[ref=..., symbol=..., qty=..., price=... CCY, side=...]"
+    //     //                     — must NOT leak counterparty PII.
+    //     throw new UnsupportedOperationException("TICKET-ADV030");
+    // }
+    @Override
+public String toString() {
+    return "EquityTrade[ref=%s, symbol=%s, qty=%s, price=%s %s, side=%s]"
+            .formatted(tradeRef, instrumentSymbol, quantity, price, currency.getCurrencyCode(), side);
+}
+
+    /** Fluent builder. Required fields validated in {@link #build()}. */
     public static final class Builder {
         private TradeRef tradeRef;
         private String instrumentSymbol;
@@ -72,6 +95,31 @@ public final class EquityTrade implements TradeType {
             if (quantity.signum() <= 0) throw new IllegalStateException("quantity must be > 0");
             if (price.signum() <= 0)    throw new IllegalStateException("price must be > 0");
             return new EquityTrade(this);
+            // TODO(TICKET-ADV019):
+            //   - Objects.requireNonNull each required field (tradeRef, instrumentSymbol,
+            //     quantity, price, currency, side, tradeDate).
+            //   - quantity and price must be > 0 (IllegalStateException otherwise).
+            //   - return new EquityTrade(this).
+
+            Objects.requireNonNull(tradeRef);
+            Objects.requireNonNull(instrumentSymbol);
+            Objects.requireNonNull(quantity);
+            Objects.requireNonNull(price);
+             Objects.requireNonNull(currency);
+            Objects.requireNonNull(side);
+            Objects.requireNonNull(tradeDate);
+            if(quantity.compareTo(BigDecimal.ZERO)<=0){
+                throw new IllegalStateException("quantity must be > 0");
+            }
+
+            if(price.compareTo(BIgDecimal.ZERO)<=0){
+                throw new IllegalStateException("price must be >0");
+            }
+            if(instrumentSymbol.isBlank()){
+                throw new IllegalStateException("instrument symbol must not be blank");
+            }
+            return new EquityTrade(this);
+
         }
     }
 }

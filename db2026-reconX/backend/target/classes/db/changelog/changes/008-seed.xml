@@ -2,6 +2,7 @@
 <!--
  ============================================================================
  Seed data (counterparties, instruments, sample trades, users)
+ TICKET-ADV017 — Seed data (counterparties, instruments, sample trades, users)
  WHAT:    Loads CSV files baked into the JAR.
  HOW:     <loadData> reads from classpath — paths are relative to the
           changeSet file. CSV headers must match column names.
@@ -74,4 +75,5 @@
         </rollback>
     </changeSet>
 
+</databaseChangeLog>
 </databaseChangeLog>
