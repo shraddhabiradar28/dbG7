@@ -7,7 +7,7 @@ import java.util.Objects;
 
 /**
  * ============================================================================
- * TICKET-ADV021 — BondTrade with Builder pattern
+ *          TICKET-ADV021 — BondTrade with Builder pattern
  *
  * WHAT:    Fixed-income trade — couponRate, maturityDate, faceValue, isin.
  * HOW:     Same builder pattern. notional() = faceValue (in the bond's ccy).
@@ -47,7 +47,8 @@ public final class BondTrade implements TradeType {
 
     /** Notional = faceValue in the bond's currency. */
     @Override public Money notional() {
-        // TODO(TICKET-ADV021): return new Money(faceValue, currency).
+        // TODO (TICKET-ADV021)
+        return new Money (faceValue, currency).
         throw new UnsupportedOperationException("TICKET-ADV021");
     }
 
@@ -60,18 +61,18 @@ public final class BondTrade implements TradeType {
     public long counterpartyId()      { return counterpartyId; }
 
     @Override public boolean equals(Object o) {
-        // TODO(TICKET-ADV028): pattern-match on BondTrade and compare tradeRef.
-        throw new UnsupportedOperationException("TICKET-ADV028");
+        return (o instanceof BondTrade other) && tradeRef.equals(other.tradeRef);
     }
     @Override public int hashCode() {
-        // TODO(TICKET-ADV028): hash from tradeRef.
-        throw new UnsupportedOperationException("TICKET-ADV028");
+        return tradeRef.hashCode();
     }
 
-    @Override public String toString() {
-        // TODO(TICKET-ADV030): "BondTrade[ref=..., isin=..., face=... CCY, coupon=..., maturity=..., side=...]"
-        throw new UnsupportedOperationException("TICKET-ADV030");
-    }
+
+@Override public String toString() {
+    return "BondTrade[ref=%s, isin=%s, face=%s %s, coupon=%s, maturity=%s, side=%s]"
+            .formatted(tradeRef, isin, faceValue, currency.getCurrencyCode(),
+                       couponRate, maturityDate, side);
+}
 
     public static final class Builder {
         private TradeRef tradeRef;

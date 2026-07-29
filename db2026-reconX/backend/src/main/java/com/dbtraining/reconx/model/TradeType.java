@@ -21,7 +21,7 @@ import java.util.Comparator;
  *          design discussion.
  * ============================================================================
  *
- * TICKET-ADV027 — Comparable natural ordering (most-recent trade first)
+ * DONE: TICKET-ADV027 — Comparable natural ordering (most-recent trade first)
  * TICKET-ADV028 — equals/hashCode based on tradeRef (the natural key)
  *
  * Comparator lives on the sealed interface, so every impl shares the same
