@@ -41,7 +41,7 @@ public final class TradeFactory {
             case BOND       -> bond(p);
             case DERIVATIVE -> derivative(p);
         };
-        throw new UnsupportedOperationException("TICKET-ADV023");
+
     }
 
     /**
@@ -60,7 +60,7 @@ public final class TradeFactory {
                 .tradeDate(LocalDate.parse((String) p.get("tradeDate")))
                 .counterpartyId(((Number) p.get("counterpartyId")).longValue())
                 .build();
-        throw new UnsupportedOperationException("TICKET-ADV023");
+
     }
 
     /**
@@ -79,7 +79,7 @@ public final class TradeFactory {
                 .tradeDate(LocalDate.parse((String) p.get("tradeDate")))
                 .counterpartyId(((Number) p.get("counterpartyId")).longValue())
                 .build();
-        throw new UnsupportedOperationException("TICKET-ADV023");
+
 
     }
 
@@ -101,7 +101,7 @@ public final class TradeFactory {
                 .tradeDate(LocalDate.parse((String) p.get("tradeDate")))
                 .counterpartyId(((Number) p.get("counterpartyId")).longValue())
                 .build();
-        throw new UnsupportedOperationException("TICKET-ADV023");
+
     }
 
     /**
@@ -124,6 +124,6 @@ public final class TradeFactory {
                 .counterpartyId(((Number) p.get("counterpartyId")).longValue())
                 .build();
     }
-        throw new UnsupportedOperationException("TICKET-ADV023");
-    }
+
 }
+

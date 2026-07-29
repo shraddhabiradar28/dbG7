@@ -125,7 +125,7 @@ public String toString() {
                 throw new IllegalStateException("quantity must be > 0");
             }
 
-            if(price.compareTo(BIgDecimal.ZERO)<=0){
+            if(price.compareTo(BigDecimal.ZERO)<=0){
                 throw new IllegalStateException("price must be >0");
             }
             if(instrumentSymbol.isBlank()){

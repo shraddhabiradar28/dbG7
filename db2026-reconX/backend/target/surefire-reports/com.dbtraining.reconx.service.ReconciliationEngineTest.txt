@@ -1,0 +1,39 @@
+-------------------------------------------------------------------------------
+Test set: com.dbtraining.reconx.service.ReconciliationEngineTest
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 3, Errors: 1, Skipped: 0, Time elapsed: 0.068 s <<< FAILURE! -- in com.dbtraining.reconx.service.ReconciliationEngineTest
+com.dbtraining.reconx.service.ReconciliationEngineTest.testReconcile_missingCounterpartyTrade_returnsBreak -- Time elapsed: 0.007 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: TICKET-ADV042 not implemented yet
+	at org.junit.jupiter.api.AssertionUtils.fail(AssertionUtils.java:38)
+	at org.junit.jupiter.api.Assertions.fail(Assertions.java:138)
+	at com.dbtraining.reconx.service.ReconciliationEngineTest.testReconcile_missingCounterpartyTrade_returnsBreak(ReconciliationEngineTest.java:41)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+com.dbtraining.reconx.service.ReconciliationEngineTest.testReconcile_exactMatch_returnsMatched -- Time elapsed: 0.010 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: TICKET-ADV040 not implemented yet
+	at org.junit.jupiter.api.AssertionUtils.fail(AssertionUtils.java:38)
+	at org.junit.jupiter.api.Assertions.fail(Assertions.java:138)
+	at com.dbtraining.reconx.service.ReconciliationEngineTest.testReconcile_exactMatch_returnsMatched(ReconciliationEngineTest.java:23)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+com.dbtraining.reconx.service.ReconciliationEngineTest.testReconcile_priceTolerance_withinThreshold -- Time elapsed: 0.025 s <<< ERROR!
+java.lang.UnsupportedOperationException: TICKET-ADV033
+	at com.dbtraining.reconx.service.ReconciliationEngine.reconcile(ReconciliationEngine.java:52)
+	at com.dbtraining.reconx.service.ReconciliationEngineTest.testReconcile_priceTolerance_withinThreshold(ReconciliationEngineTest.java:31)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+com.dbtraining.reconx.service.ReconciliationEngineTest.testReconcile_emptyInternal_returnsEmpty -- Time elapsed: 0 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: TICKET-ADV040 not implemented yet
+	at org.junit.jupiter.api.AssertionUtils.fail(AssertionUtils.java:38)
+	at org.junit.jupiter.api.Assertions.fail(Assertions.java:138)
+	at com.dbtraining.reconx.service.ReconciliationEngineTest.testReconcile_emptyInternal_returnsEmpty(ReconciliationEngineTest.java:47)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+

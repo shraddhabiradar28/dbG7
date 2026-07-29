@@ -25,8 +25,13 @@ class ReconciliationEngineTest {
 
     @Test
     void testReconcile_priceTolerance_withinThreshold() {
-        // TODO(TICKET-ADV041): prices 100.00 vs 100.50 + PRICE_TOLERANCE_1PCT rule -> status MATCHED.
-        org.junit.jupiter.api.Assertions.fail("TICKET-ADV041 not implemented yet");
+        EquityTrade internal = equity("EQU-20260603-0002", "100.00", "1000");
+        EquityTrade external = equity("EQU-20260603-0002", "100.50", "1000");
+
+        List<ReconResult> out = engine.reconcile(List.of(internal), List.of(external),
+                ReconciliationRule.PRICE_TOLERANCE_1PCT);
+
+        assertThat(out.get(0).status()).isEqualTo(ReconResult.Status.MATCHED);
     }
 
     @Test
