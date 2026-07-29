@@ -51,6 +51,7 @@ public final class DerivativeTrade implements TradeType {
     /** Simplified notional = strike * quantity in the trade currency. */
     @Override public Money notional() {
         // TODO(TICKET-ADV022): return new Money(strike * quantity, currency).
+        return new Money(Strike.multiply(quantitiy) currency);
         throw new UnsupportedOperationException("TICKET-ADV022");
     }
 
@@ -105,6 +106,21 @@ public final class DerivativeTrade implements TradeType {
             //   - strike and quantity must be > 0.
             //   - expiry must not be before tradeDate.
             //   - return new DerivativeTrade(this).
+            Objects.requireNonNull(tradeRef,   "tradeRef");
+            Objects.requireNonNull(underlying, "underlying");
+            Objects.requireNonNull(strike,     "strike");
+            Objects.requireNonNull(quantity,   "quantity");
+            Objects.requireNonNull(expiry,     "expiry");
+            Objects.requireNonNull(optionType, "optionType");
+            Objects.requireNonNull(currency,   "currency");
+            Objects.requireNonNull(side,       "side");
+            Objects.requireNonNull(tradeDate,  "tradeDate");
+            if (strike.signum() <= 0)   throw new IllegalStateException("strike must be > 0");
+            if (quantity.signum() <= 0) throw new IllegalStateException("quantity must be > 0");
+            if (expiry.isBefore(tradeDate))
+                throw new IllegalStateException("expiry cannot be before tradeDate");
+            return new DerivativeTrade(this);
+
             throw new UnsupportedOperationException("TICKET-ADV022");
         }
     }
