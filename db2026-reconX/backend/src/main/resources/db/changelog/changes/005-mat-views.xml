@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
  ============================================================================
- TICKET-ADV008 — Materialised view mv_daily_recon_summary
+ DONE: TICKET-ADV008 — Materialised view mv_daily_recon_summary
  WHAT:    Daily aggregate of matched/break counts + total notional, used by
           the dashboard's "today at a glance" cards.
  HOW:     REFRESH MATERIALIZED VIEW CONCURRENTLY (requires unique index).
