@@ -54,6 +54,8 @@
 /home/suraj-kumar-nayak/db/dbG7/db2026-reconX/backend/src/main/java/com/dbtraining/reconx/security/JwtTokenProvider.java
 /home/suraj-kumar-nayak/db/dbG7/db2026-reconX/backend/src/main/java/com/dbtraining/reconx/security/SecurityConfig.java
 /home/suraj-kumar-nayak/db/dbG7/db2026-reconX/backend/src/main/java/com/dbtraining/reconx/service/InstrumentService.java
+/home/suraj-kumar-nayak/db/dbG7/db2026-reconX/backend/src/main/java/com/dbtraining/reconx/service/ReconSummary.java
+/home/suraj-kumar-nayak/db/dbG7/db2026-reconX/backend/src/main/java/com/dbtraining/reconx/service/ReconSummaryCollector.java
 /home/suraj-kumar-nayak/db/dbG7/db2026-reconX/backend/src/main/java/com/dbtraining/reconx/service/ReconciliationEngine.java
 /home/suraj-kumar-nayak/db/dbG7/db2026-reconX/backend/src/main/java/com/dbtraining/reconx/service/TradeAnalyticsService.java
 /home/suraj-kumar-nayak/db/dbG7/db2026-reconX/backend/src/main/java/com/dbtraining/reconx/service/TradeService.java
