@@ -6,7 +6,7 @@
           domain/common). In the TRAINER COPY we ship a single runnable module
           to keep the answer key easy to boot. The trainer guide day4 shows the
           multi-module split.
- HOW:     Standard Spring Boot 3 parent + java.version=25.
+ HOW:     Standard Spring Boot 3 parent + java.version=21.
  WHY:     Students need a project that runs in one `mvn spring-boot:run`. Once
           they pass Day 4 they can split this into modules and re-import.
  OBSERVE: `./mvnw spring-boot:run -Dspring-boot.run.profiles=dev` boots cleanly,
@@ -136,7 +136,7 @@
         <!-- Swagger / OpenAPI (ADV058) -->
         <dependency>
             <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
             <version>2.6.0</version>
         </dependency>
 
