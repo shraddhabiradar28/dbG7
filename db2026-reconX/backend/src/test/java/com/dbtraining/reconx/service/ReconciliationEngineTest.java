@@ -34,22 +34,15 @@ class ReconciliationEngineTest {
     }
 
     @Test
+    @Test
     void testReconcile_priceTolerance_withinThreshold() {
-        ReconciliationEngine engine = new ReconciliationEngine();
-        try {
-            EquityTrade internal = equity("EQU-20260603-0002", "100.00", "10", 1L);
-            EquityTrade external = equity("EQU-20260603-0002", "100.50", "10", 1L);
+        EquityTrade internal = equity("EQU-20260603-0002", "100.00", "1000");
+        EquityTrade external = equity("EQU-20260603-0002", "100.50", "1000");
 
-            List<ReconResult> results = engine.reconcile(List.of(internal), List.of(external),
-                    ReconciliationRule.PRICE_TOLERANCE_1PCT);
+        List<ReconResult> out = engine.reconcile(List.of(internal), List.of(external),
+                ReconciliationRule.PRICE_TOLERANCE_1PCT);
 
-            assertThat(results)
-                    .singleElement()
-                    .extracting(ReconResult::status)
-                    .isEqualTo(ReconResult.Status.MATCHED);
-        } finally {
-            engine.shutdown();
-        }
+        assertThat(out.get(0).status()).isEqualTo(ReconResult.Status.MATCHED);
     }
 
     @Test
