@@ -73,6 +73,12 @@ public final class EquityTrade implements TradeType {
         return Objects.hash(tradeRef);
     }
 
+    // @Override
+    // public String toString() {
+    //     // TODO(TICKET-ADV030): "EquityTrade[ref=..., symbol=..., qty=..., price=... CCY, side=...]"
+    //     //                     — must NOT leak counterparty PII.
+    //     throw new UnsupportedOperationException("TICKET-ADV030");
+    // }
     @Override
     public String toString() {
         return "EquityTrade[ref=%s, symbol=%s, qty=%s, price=%s %s, side=%s]"
