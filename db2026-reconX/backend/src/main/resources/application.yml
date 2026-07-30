@@ -25,7 +25,7 @@ spring:
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
     properties:
       hibernate.jdbc.time_zone: UTC
       hibernate.format_sql: true
@@ -63,6 +63,8 @@ spring:
 server:
   servlet:
     context-path: /api
+  tomcat:
+    basedir: ${TOMCAT_BASE_DIR:${user.dir}/target/tomcat}
 
 # =============================================================================
 # TICKET-ADV083-ADV086 / ADV097 — Actuator + Prometheus exposure

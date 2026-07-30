@@ -8,6 +8,8 @@ import com.dbtraining.reconx.observability.TradeMetrics;
 import com.dbtraining.reconx.repository.CounterpartyRepository;
 import com.dbtraining.reconx.repository.InstrumentRepository;
 import com.dbtraining.reconx.repository.TradeRepository;
+import com.dbtraining.reconx.repository.entity.Counterparty;
+import com.dbtraining.reconx.repository.entity.Instrument;
 import com.dbtraining.reconx.repository.entity.Trade;
 import com.dbtraining.reconx.dto.TradeEvent;
 import org.springframework.data.domain.Page;
@@ -60,9 +62,43 @@ public class TradeService {
         //   build a new Trade with instrument + counterparty looked up from
         //   their repos (throw TradeNotFoundException on miss), status = "PENDING",
         //   save, then:
+        
+    // Check for duplicate trade reference
+    tradeRepo.findByTradeRef(req.tradeRef())
+            .ifPresent(t -> {
+                throw new DuplicateTradeRefException("Trade already exists: " + req.tradeRef());
+            });
+
+    // Find Instrument
+    Instrument instrument = instRepo.findById(req.instrumentId())
+            .orElseThrow(() ->
+                    new TradeNotFoundException("Instrument not found: " + req.instrumentId()));
+
+    // Find Counterparty
+    Counterparty counterparty = cpRepo.findById(req.counterpartyId())
+            .orElseThrow(() ->
+                    new TradeNotFoundException("Counterparty not found: " + req.counterpartyId()));
+
+    // Create and populate Trade entity
+    Trade trade = new Trade();
+    trade.setTradeRef(req.tradeRef());
+    trade.setInstrument(instrument);
+    trade.setCounterparty(counterparty);
+    trade.setAssetClass(req.assetClass());
+    trade.setSide(req.side());
+    trade.setQuantity(req.quantity());
+    trade.setPrice(req.price());
+    trade.setTradeDate(req.tradeDate());
+    trade.setStatus("PENDING");
+
+    // Save the trade
+    Trade saved = tradeRepo.save(trade);
+
+    return saved;
+
         //     - metrics.incrementTradeCreated() + metrics.recordTradeValue(qty*price) — TICKET-ADV083
         //     - events.publish(new TradeEvent(... TRADE_CREATED ... actor ...)) — TICKET-ADV129
-        throw new UnsupportedOperationException("TICKET-ADV064");
+       
     }
 
     public Trade update(Long id, TradeRequest req, String actor) {
@@ -85,10 +121,9 @@ public class TradeService {
 
     @Transactional(readOnly = true)
     public Page<Trade> list(LocalDate from, LocalDate to, String status, Long counterpartyId, Pageable pageable) {
-        // TODO(TICKET-ADV055 + TICKET-ADV056): combine the static helpers from
-        //   TradeSpecifications (hasStatus, tradeDateBetween, hasCounterparty)
-        //   via Specification.where(...).and(...) and call
-        //   tradeRepo.findAll(spec, pageable). Until JPA is in place, throw.
-        throw new UnsupportedOperationException("TICKET-ADV055");
+        Specification<Trade> spec = Specification.where(tradeDateBetween(from, to))
+                .and(hasStatus(status))
+                .and(hasCounterparty(counterpartyId));
+        return tradeRepo.findAll(spec, pageable);
     }
 }
