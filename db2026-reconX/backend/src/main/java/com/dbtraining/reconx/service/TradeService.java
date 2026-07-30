@@ -56,28 +56,23 @@ public class TradeService {
         this.events = events;
         this.metrics = metrics;
     }
+public Trade create(TradeRequest req, String actor) {
 
-    public Trade create(TradeRequest req, String actor) {
-        // TODO(TICKET-ADV064): reject duplicate tradeRef via DuplicateTradeRefException,
-        //   build a new Trade with instrument + counterparty looked up from
-        //   their repos (throw TradeNotFoundException on miss), status = "PENDING",
-        //   save, then:
-        
     // Check for duplicate trade reference
     tradeRepo.findByTradeRef(req.tradeRef())
             .ifPresent(t -> {
-                throw new DuplicateTradeRefException("Trade already exists: " + req.tradeRef());
+                throw new DuplicateTradeRefException(req.tradeRef());
             });
 
     // Find Instrument
     Instrument instrument = instRepo.findById(req.instrumentId())
             .orElseThrow(() ->
-                    new TradeNotFoundException("Instrument not found: " + req.instrumentId()));
+                    new TradeNotFoundException(String.valueOf(req.instrumentId())));
 
     // Find Counterparty
     Counterparty counterparty = cpRepo.findById(req.counterpartyId())
             .orElseThrow(() ->
-                    new TradeNotFoundException("Counterparty not found: " + req.counterpartyId()));
+                    new TradeNotFoundException(String.valueOf(req.counterpartyId())));
 
     // Create and populate Trade entity
     Trade trade = new Trade();
@@ -94,18 +89,31 @@ public class TradeService {
     // Save the trade
     Trade saved = tradeRepo.save(trade);
 
+    // TICKET-ADV083 - Metrics
+    metrics.incrementTradeCreated();
+
+    metrics.recordTradeValue(
+            saved.getQuantity()
+                    .multiply(saved.getPrice())
+                    .doubleValue()
+    );
+
+    // TICKET-ADV129 - Publish event
+    events.publish(
+            new TradeEvent(
+                    UUID.randomUUID(),
+                    saved.getTradeRef(),
+                    TradeEvent.EventType.TRADE_CREATED,
+                    Instant.now(),
+                    actor,
+                    null,
+                    saved.getStatus()
+            )
+    );
+
     return saved;
+}
 
-        //     - metrics.incrementTradeCreated() + metrics.recordTradeValue(qty*price) — TICKET-ADV083
-        //     - events.publish(new TradeEvent(... TRADE_CREATED ... actor ...)) — TICKET-ADV129
-       
-    }
-
-    // public Trade update(Long id, TradeRequest req, String actor) {
-    //     // TODO(TICKET-ADV065): load by id (throw TradeNotFoundException if missing),
-    //     //   copy mutable fields from req, save, publish a TRADE_UPDATED event.
-    //     throw new UnsupportedOperationException("TICKET-ADV065");
-    // }
     public Trade update(Long id, TradeRequest req, String actor) {
 
     // Load the existing trade
@@ -140,11 +148,37 @@ public class TradeService {
     return saved;
 }
 
-    public Trade updateStatus(Long id, String status, String actor) {
-        // TODO(TICKET-ADV066): load, setStatus(status), save, publish TRADE_UPDATED
-        //   with the new status in the "after" slot of the event.
-        throw new UnsupportedOperationException("TICKET-ADV066");
-    }
+public Trade updateStatus(Long id, String status, String actor) {
+
+    // Load the trade or throw if it doesn't exist
+    Trade trade = tradeRepo.findById(id)
+            .orElseThrow(() ->
+                    new TradeNotFoundException(String.valueOf(id)));
+
+    // Keep the old status for the event
+    String previousStatus = trade.getStatus();
+
+    // Update the status
+    trade.setStatus(status);
+
+    // Save the updated trade
+    Trade saved = tradeRepo.save(trade);
+
+    // Publish TRADE_UPDATED event
+    events.publish(
+            new TradeEvent(
+                    UUID.randomUUID(),
+                    saved.getTradeRef(),
+                    TradeEvent.EventType.TRADE_UPDATED,
+                    Instant.now(),
+                    actor,
+                    previousStatus,
+                    saved.getStatus()
+            )
+    );
+
+    return saved;
+}
 
     public void softDelete(Long id, String actor) {
         // TODO(TICKET-ADV067): load, call t.softDelete() (sets deleted_at), save,

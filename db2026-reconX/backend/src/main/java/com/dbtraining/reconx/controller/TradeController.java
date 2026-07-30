@@ -104,15 +104,23 @@ public TradeResponse update(@PathVariable Long id, @Valid @RequestBody TradeRequ
     return mapper.toResponse(service.update(id, req, String.valueOf(principal)));
 }
 
+    // @PatchMapping("/{id}/status")
+    // @Operation(summary = "Update only the status field")
+    // public TradeResponse updateStatus(@PathVariable Long id,
+    //                                   @RequestBody Map<String, String> body,
+    //                                   @AuthenticationPrincipal Object principal) {
+    //     // TODO(TICKET-ADV066): read body.get("status") and call
+    //     //   service.updateStatus(id, status, actor). Return mapper.toResponse(saved).
+    //     throw new UnsupportedOperationException("TICKET-ADV066");
+    // }
     @PatchMapping("/{id}/status")
-    @Operation(summary = "Update only the status field")
-    public TradeResponse updateStatus(@PathVariable Long id,
-                                      @RequestBody Map<String, String> body,
-                                      @AuthenticationPrincipal Object principal) {
-        // TODO(TICKET-ADV066): read body.get("status") and call
-        //   service.updateStatus(id, status, actor). Return mapper.toResponse(saved).
-        throw new UnsupportedOperationException("TICKET-ADV066");
-    }
+@Operation(summary = "Update only the status field")
+public TradeResponse updateStatus(@PathVariable Long id,
+                                  @RequestBody Map<String, String> body,
+                                  @AuthenticationPrincipal Object principal) {
+    String status = body.get("status");
+    return mapper.toResponse(service.updateStatus(id, status, String.valueOf(principal)));
+}
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Soft delete (sets deleted_at)")
