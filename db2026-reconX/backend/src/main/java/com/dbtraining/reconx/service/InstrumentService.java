@@ -1,5 +1,6 @@
 package com.dbtraining.reconx.service;
 
+import com.dbtraining.reconx.exception.InvalidTradeException;
 import com.dbtraining.reconx.repository.InstrumentRepository;
 import com.dbtraining.reconx.repository.entity.Instrument;
 import org.slf4j.Logger;
