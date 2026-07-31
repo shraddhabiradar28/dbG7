@@ -28,4 +28,6 @@ public interface TradeRepository
         @Param("counterpartyId") Long counterpartyId,
         Pageable pageable
     );
+
+    long countByStatus(String status);
 }
