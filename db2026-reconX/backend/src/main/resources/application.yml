@@ -15,6 +15,8 @@ spring:
     name: reconx
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
+    jmx:
+      enabled: true
 
   # ADV012 — Liquibase classpath wiring (the classic starter bug is missing the
   # `classpath:` prefix here, which causes a silent  skip on JAR  builds).
@@ -25,10 +27,14 @@ spring:
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
     properties:
       hibernate.jdbc.time_zone: UTC
       hibernate.format_sql: true
+
+  sql:
+    init:
+      mode: never
 
 
   # ADV081-ADV082 — Caffeine cache config; per-cache spec overrides the global one.
@@ -59,6 +65,8 @@ spring:
 server:
   servlet:
     context-path: /api
+  tomcat:
+    basedir: ${TOMCAT_BASE_DIR:${user.dir}/target/tomcat}
 
 # =============================================================================
 # TICKET-ADV083-ADV086 / ADV097 — Actuator + Prometheus exposure

@@ -15,6 +15,10 @@ spring:
       enabled: true
       path: /h2
 
+  server:
+    tomcat:
+      basedir: target/tomcat
+
   # H2 doesn't ship a JSONB type — Liquibase preconditions in the changelog skip
   # the JSONB GIN-index step on H2 (see 003-jsonb.xml).
   jpa:
