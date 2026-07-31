@@ -1,14 +1,13 @@
 package com.dbtraining.reconx.repository;
 
-import com.dbtraining.reconx.domain.Trade;
-import com.dbtraining.reconx.domain.TradeStatus;
+import com.dbtraining.reconx.repository.entity.Trade;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
 
-public final class TradeSpecification {
+public final class TradeSpecifications {
 
-    private TradeSpecification() {}
+    private TradeSpecifications() {}
 
     public static Specification<Trade> tradeDateBetween(LocalDate from, LocalDate to) {
         return (root, q, cb) -> {
@@ -19,8 +18,8 @@ public final class TradeSpecification {
         };
     }
 
-    public static Specification<Trade> hasStatus(TradeStatus status) {
-        return (root, q, cb) -> status == null
+    public static Specification<Trade> hasStatus(String status) {
+        return (root, q, cb) -> status == null || status.isBlank()
                 ? cb.conjunction()
                 : cb.equal(root.get("status"), status);
     }
