@@ -41,26 +41,16 @@ public record Money(BigDecimal amount, Currency currency) {
 
     /** Add another Money of the same currency. Throws on currency mismatch. */
     public Money plus(Money other) {
-        // TODO(TICKET-ADV024): validate same currency, then return a new Money
-        //                     whose amount = this.amount + other.amount.
         Objects.requireNonNull(other);
-        if(!currency.eqauls(other.currency())){
-            throw new 
-        IllegalArgumentException("Currencies must match");
-        }
-        return new 
-        Money(amount.add(other.amount()),currency);
-        if (!this.currency.equals(other.currency)) {
+        if (!this.currency.equals(other.currency())) {
             throw new IllegalArgumentException(
-                    "Cannot add %s to %s — currency mismatch".formatted(other.currency, this.currency));
+                    "Cannot add %s to %s — currency mismatch".formatted(other.currency(), this.currency));
         }
-        return new Money(this.amount.add(other.amount), this.currency);
-        throw new UnsupportedOperationException("TICKET-ADV024");
+        return new Money(this.amount.add(other.amount()), this.currency);
     }
 
     public Money times(BigDecimal multiplier) {
-        // TODO(TICKET-ADV024): return a new Money whose amount = this.amount * multiplier.
+        Objects.requireNonNull(multiplier, "multiplier");
         return new Money(this.amount.multiply(multiplier), this.currency);
-        throw new UnsupportedOperationException("TICKET-ADV024");
     }
 }
