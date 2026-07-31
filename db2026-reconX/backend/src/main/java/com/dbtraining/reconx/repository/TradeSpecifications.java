@@ -1,17 +1,25 @@
 package com.dbtraining.reconx.repository;
 
-import java.time.LocalDate;
-
+import com.dbtraining.reconx.repository.entity.Trade;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.dbtraining.reconx.repository.entity.Trade;
 
-public final class TradeSpecification {
+public final class TradeSpecifications {
 
-    private TradeSpecification() {}
+    private TradeSpecifications() {}
+
+    public static Specification<Trade> tradeDateBetween(LocalDate from, LocalDate to) {
+        return (root, q, cb) -> {
+            if (from == null && to == null) return cb.conjunction();
+            if (from == null)               return cb.lessThanOrEqualTo(root.get("tradeDate"), to);
+            if (to == null)                 return cb.greaterThanOrEqualTo(root.get("tradeDate"), from);
+            return cb.between(root.get("tradeDate"), from, to);
+        };
+    }
 
     public static Specification<Trade> hasStatus(String status) {
-        return (root, query, cb) -> status == null
+        return (root, q, cb) -> status == null || status.isBlank()
                 ? cb.conjunction()
                 : cb.equal(root.get("status"), status);
     }
