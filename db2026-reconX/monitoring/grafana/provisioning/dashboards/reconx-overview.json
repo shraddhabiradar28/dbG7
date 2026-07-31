@@ -3,7 +3,7 @@
   "editable": true,
   "graphTooltip": 1,
   "id": null,
-  "panels": [
+  "panels":  [
     {
       "type": "timeseries",
       "title": "API request rate by endpoint (ADV087)",
