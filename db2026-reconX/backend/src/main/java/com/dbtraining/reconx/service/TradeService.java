@@ -1,26 +1,18 @@
 package com.dbtraining.reconx.service;
 
 import com.dbtraining.reconx.dto.TradeRequest;
-import com.dbtraining.reconx.exception.DuplicateTradeRefException;
-import com.dbtraining.reconx.exception.TradeNotFoundException;
 import com.dbtraining.reconx.kafka.TradeEventProducer;
 import com.dbtraining.reconx.observability.TradeMetrics;
 import com.dbtraining.reconx.repository.CounterpartyRepository;
 import com.dbtraining.reconx.repository.InstrumentRepository;
 import com.dbtraining.reconx.repository.TradeRepository;
 import com.dbtraining.reconx.repository.entity.Trade;
-import com.dbtraining.reconx.dto.TradeEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.time.LocalDate;
-import java.util.UUID;
-
-import static com.dbtraining.reconx.repository.TradeSpecifications.*;
 
 /**
  * ============================================================================
@@ -37,22 +29,11 @@ import static com.dbtraining.reconx.repository.TradeSpecifications.*;
 @Transactional
 public class TradeService {
 
-    private final TradeRepository tradeRepo;
-    private final CounterpartyRepository cpRepo;
-    private final InstrumentRepository instRepo;
-    private final TradeEventProducer events;
-    private final TradeMetrics metrics;
-
     public TradeService(TradeRepository tradeRepo,
                         CounterpartyRepository cpRepo,
                         InstrumentRepository instRepo,
                         TradeEventProducer events,
                         TradeMetrics metrics) {
-        this.tradeRepo = tradeRepo;
-        this.cpRepo = cpRepo;
-        this.instRepo = instRepo;
-        this.events = events;
-        this.metrics = metrics;
     }
 
     public Trade create(TradeRequest req, String actor) {
