@@ -42,19 +42,17 @@ public class ReconController {
     @GetMapping("/jobs/{jobId}/results")
     @Operation(summary = "Get results for a recon job")
     public List<ReconBreak> results(@PathVariable String jobId) {
-        // TODO(TICKET-ADV069): once recon_jobs + recon_breaks tables are wired,
-        //   return breaks.findByJobId(jobId). Day-0 returns an empty list so
-        //   the React breaks-table renders "no breaks" gracefully.
-        return Collections.emptyList();
+        // The trainer-copy stub returns all current open breaks.
+        return breaks.findAll();
     }
 
     @PutMapping("/results/{id}/resolve")
     @Operation(summary = "Mark a recon break as RESOLVED with a note")
     public ResponseEntity<ReconBreak> resolve(@PathVariable Long id,
                                               @RequestBody Map<String, String> body) {
-        // TODO(TICKET-ADV070): load the ReconBreak, call rb.resolve(note), save,
-        //   and return 200 with the updated entity. Throw TradeNotFoundException
-        //   when the id is unknown.
-        throw new UnsupportedOperationException("TICKET-ADV070");
+        ReconBreak rb = breaks.findById(id)
+                .orElseThrow(() -> new TradeNotFoundException("recon_break " + id));
+        rb.resolve(body.getOrDefault("note", "manually resolved"));
+        return ResponseEntity.ok(breaks.save(rb));
     }
 }
