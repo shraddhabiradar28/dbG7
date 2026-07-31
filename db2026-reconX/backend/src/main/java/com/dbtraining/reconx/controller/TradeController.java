@@ -1,5 +1,26 @@
 package com.dbtraining.reconx.controller;
 
+import java.net.URI;
+import java.time.LocalDate;
+import java.util.Map;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.dbtraining.reconx.dto.PagedResponse;
 import com.dbtraining.reconx.dto.TradeMapper;
 import com.dbtraining.reconx.dto.TradeRequest;
@@ -12,24 +33,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
-
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-
-import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
-import java.time.LocalDate;
-import java.util.Map;
 
 
 /**
@@ -56,76 +59,71 @@ public class TradeController {
         this.mapper = mapper;
     }
 
+    // @GetMapping
+    // @Operation(summary = "List trades — paginated, filterable, sortable")
+    // public PagedResponse<TradeResponse> list(
+    //         @RequestParam(required = false) LocalDate from,
+    //         @RequestParam(required = false) LocalDate to,
+    //         @RequestParam(required = false) String status,
+    //         @RequestParam(required = false) Long counterpartyId,
+    //         @PageableDefault(size = 20, sort = "tradeDate", direction = Sort.Direction.DESC) Pageable pageable) {
+    //     // TODO(TICKET-ADV063): delegate to service.list(from, to, status, counterpartyId, pageable)
 
-    @GetMapping
-    @Operation(summary = "List trades — paginated, filterable, sortable")
-    public PagedResponse<TradeResponse> list(
-            @RequestParam(required = false) LocalDate from,
-            @RequestParam(required = false) LocalDate to,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) Long counterpartyId,
-            @PageableDefault(
-                    size = 20,
-                    sort = "tradeDate",
-                    direction = Sort.Direction.DESC
-            ) Pageable pageable) {
+        
+    //     //   and wrap the resulting Page<Trade> via PagedResponse.from(page, mapper::toResponse).
+    //     //   For Day 1 return an empty PagedResponse so the React grid renders
+    //     //   "no trades match" while the JPA + Specifications work is still pending.
+    //     return new PagedResponse<>(List.of(), 0, 20, 0, 0);
+    // }
+@GetMapping
+@Operation(summary = "List trades — paginated, filterable, sortable")
+public PagedResponse<TradeResponse> list(
+        @RequestParam(required = false) LocalDate from,
+        @RequestParam(required = false) LocalDate to,
+        @RequestParam(required = false) String status,
+        @RequestParam(required = false) Long counterpartyId,
+        @PageableDefault(size = 20, sort = "tradeDate", direction = Sort.Direction.DESC) Pageable pageable) {
+    Page<Trade> page = service.list(from, to, status, counterpartyId, pageable);
+    return PagedResponse.from(page, mapper::toResponse);
+}
 
-        Page<Trade> page =
-                service.list(from, to, status, counterpartyId, pageable);
-
-        return PagedResponse.from(page, mapper::toResponse);
-    }
-
-
+  
     @PostMapping
-    @Operation(summary = "Create a trade")
-    public ResponseEntity<TradeResponse> create(
-            @Valid @RequestBody TradeRequest req,
-            @AuthenticationPrincipal String actor) {
-
-        Trade saved = service.create(req, actor);
-
-        URI location =
-                URI.create("/api/v1/trades/" + saved.getId());
-
-        return ResponseEntity
-                .created(location)
-                .body(mapper.toResponse(saved));
-    }
+@Operation(summary = "Create a trade")
+public ResponseEntity<TradeResponse> create(@Valid @RequestBody TradeRequest req,
+                                            @AuthenticationPrincipal Object principal) {
+    String actor = String.valueOf(principal);
+    Trade saved = service.create(req, actor);
+    return ResponseEntity
+            .created(URI.create("/api/v1/trades/" + saved.getId()))
+            .body(mapper.toResponse(saved));
+}
 
 
-    @PutMapping("/{id}")
-    @Operation(summary = "Full update of a trade")
-    public TradeResponse update(
-            @PathVariable Long id,
-            @Valid @RequestBody TradeRequest req,
-            @AuthenticationPrincipal String actor) {
+@PutMapping("/{id}")
+@Operation(summary = "Full update of a trade")
+public TradeResponse update(@PathVariable Long id, @Valid @RequestBody TradeRequest req,
+                            @AuthenticationPrincipal Object principal) {
+    return mapper.toResponse(service.update(id, req, String.valueOf(principal)));
+}
 
-        return mapper.toResponse(
-                service.update(id, req, actor)
-        );
-    }
-
-
+    // @PatchMapping("/{id}/status")
+    // @Operation(summary = "Update only the status field")
+    // public TradeResponse updateStatus(@PathVariable Long id,
+    //                                   @RequestBody Map<String, String> body,
+    //                                   @AuthenticationPrincipal Object principal) {
+    //     // TODO(TICKET-ADV066): read body.get("status") and call
+    //     //   service.updateStatus(id, status, actor). Return mapper.toResponse(saved).
+    //     throw new UnsupportedOperationException("TICKET-ADV066");
+    // }
     @PatchMapping("/{id}/status")
-    @Operation(summary = "Update only the status field")
-    public TradeResponse updateStatus(
-            @PathVariable Long id,
-            @RequestBody Map<String, String> body,
-            @AuthenticationPrincipal String actor) {
-
-        String status = body.get("status");
-
-        if (status == null || status.isBlank()) {
-            throw new IllegalArgumentException(
-                    "status must be provided"
-            );
-        }
-
-        return mapper.toResponse(
-                service.updateStatus(id, status, actor)
-        );
-    }
+@Operation(summary = "Update only the status field")
+public TradeResponse updateStatus(@PathVariable Long id,
+                                  @RequestBody Map<String, String> body,
+                                  @AuthenticationPrincipal Object principal) {
+    String status = body.get("status");
+    return mapper.toResponse(service.updateStatus(id, status, String.valueOf(principal)));
+}
 
 
     @DeleteMapping("/{id}")
