@@ -47,9 +47,7 @@ public final class BondTrade implements TradeType {
 
     /** Notional = faceValue in the bond's currency. */
     @Override public Money notional() {
-        // TODO (TICKET-ADV021)
-        return new Money (faceValue, currency).
-        throw new UnsupportedOperationException("TICKET-ADV021");
+        return new Money(faceValue, currency);
     }
 
     public String isin()              { return isin; }
@@ -67,10 +65,12 @@ public final class BondTrade implements TradeType {
         return tradeRef.hashCode();
     }
 
-    @Override public String toString() {
-        // TODO(TICKET-ADV030): "BondTrade[ref=..., isin=..., face=... CCY, coupon=..., maturity=..., side=...]"
-        throw new UnsupportedOperationException("TICKET-ADV030");
-    }
+
+@Override public String toString() {
+    return "BondTrade[ref=%s, isin=%s, face=%s %s, coupon=%s, maturity=%s, side=%s]"
+            .formatted(tradeRef, isin, faceValue, currency.getCurrencyCode(),
+                       couponRate, maturityDate, side);
+}
 
     public static final class Builder {
         private TradeRef tradeRef;

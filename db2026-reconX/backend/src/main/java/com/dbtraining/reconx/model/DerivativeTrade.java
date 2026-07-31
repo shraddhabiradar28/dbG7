@@ -50,9 +50,7 @@ public final class DerivativeTrade implements TradeType {
 
     /** Simplified notional = strike * quantity in the trade currency. */
     @Override public Money notional() {
-        // TODO(TICKET-ADV022): return new Money(strike * quantity, currency).
-        return new Money(Strike.multiply(quantitiy) currency);
-        throw new UnsupportedOperationException("TICKET-ADV022");
+        return new Money(strike.multiply(quantity), currency);
     }
 
     public String underlying()       { return underlying; }
@@ -72,9 +70,10 @@ public final class DerivativeTrade implements TradeType {
     }
 
     @Override public String toString() {
-        // TODO(TICKET-ADV030): "DerivativeTrade[ref=..., TYPE UNDERLYING on date, strike=... CCY, qty=..., expiry=..., side=...]"
-        throw new UnsupportedOperationException("TICKET-ADV030");
-    }
+    return "DerivativeTrade[ref=%s, %s %s on %s, strike=%s %s, qty=%s, expiry=%s, side=%s]"
+            .formatted(tradeRef, optionType, underlying, tradeDate, strike,
+                       currency.getCurrencyCode(), quantity, expiry, side);
+}
 
     public static final class Builder {
         private TradeRef tradeRef;
@@ -98,11 +97,6 @@ public final class DerivativeTrade implements TradeType {
         public Builder counterpartyId(long v)      { this.counterpartyId = v; return this; }
 
         public DerivativeTrade build() {
-            // TODO(TICKET-ADV022):
-            //   - Objects.requireNonNull each required field.
-            //   - strike and quantity must be > 0.
-            //   - expiry must not be before tradeDate.
-            //   - return new DerivativeTrade(this).
             Objects.requireNonNull(tradeRef,   "tradeRef");
             Objects.requireNonNull(underlying, "underlying");
             Objects.requireNonNull(strike,     "strike");
@@ -117,8 +111,6 @@ public final class DerivativeTrade implements TradeType {
             if (expiry.isBefore(tradeDate))
                 throw new IllegalStateException("expiry cannot be before tradeDate");
             return new DerivativeTrade(this);
-
-            throw new UnsupportedOperationException("TICKET-ADV022");
         }
     }
 }
