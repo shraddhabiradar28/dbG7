@@ -31,15 +31,18 @@ import com.dbtraining.reconx.service.TradeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.validation.Valid;
+
 
 /**
  * ============================================================================
  * TICKET-ADV063-ADV067 — TradeController (full CRUD + filterable list)
  * TICKET-ADV080 — API versioning: every endpoint under /v1/
  *
- * Combined with the /api context-path from application.yml, full URLs are
- * /api/v1/trades, /api/v1/trades/{id} etc.
+ * Combined with /api context-path from application.yml:
+ * /api/v1/trades
+ * /api/v1/trades/{id}
  * ============================================================================
  */
 @RestController
@@ -122,11 +125,45 @@ public TradeResponse updateStatus(@PathVariable Long id,
     return mapper.toResponse(service.updateStatus(id, status, String.valueOf(principal)));
 }
 
+
     @DeleteMapping("/{id}")
     @Operation(summary = "Soft delete (sets deleted_at)")
-    public ResponseEntity<Void> delete(@PathVariable Long id,
-                                       @AuthenticationPrincipal Object principal) {
-        // TODO(TICKET-ADV067): service.softDelete(id, actor); return 204 No Content.
-        throw new UnsupportedOperationException("TICKET-ADV067");
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id,
+            @AuthenticationPrincipal String actor) {
+
+        service.softDelete(id, actor);
+
+        return ResponseEntity.noContent().build();
+    }
+
+
+    @Deprecated(
+            since = "v1.4.0",
+            forRemoval = true
+    )
+    @GetMapping(
+            value = "/old-search",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @Operation(summary = "Deprecated old search endpoint")
+    public ResponseEntity<Void> oldSearch() {
+
+        HttpHeaders headers = new HttpHeaders();
+
+        headers.add("Deprecation", "true");
+        headers.add(
+                "Sunset",
+                "Sat, 1 Jul 2026 00:00:00 GMT"
+        );
+        headers.add(
+                "Link",
+                "</api/v1/trades?status=...>; rel=\"successor-version\""
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.GONE)
+                .headers(headers)
+                .build();
     }
 }
