@@ -6,12 +6,10 @@ import com.dbtraining.reconx.model.TradeType;
 import io.micrometer.core.annotation.Timed;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * ============================================================================
@@ -66,21 +64,5 @@ public class ReconciliationEngine {
         //   CompletableFuture.allOf(...).thenApply(v -> futures.stream()
         //       .flatMap(f -> f.join().stream()).toList()).
         throw new UnsupportedOperationException("TICKET-ADV037");
-    }
-
-    private ReconResult matchOne(TradeType internal, TradeType external, ReconciliationRule rule) {
-        // TODO(TICKET-ADV033): if external is null return ReconResult.breakResult(ref, "MISSING_EXTERNAL", ...).
-        //   Otherwise pull priceQty() for both sides, compare via rule.matches(...),
-        //   return ReconResult.matched(ref) or breakResult(ref, "VALUE_MISMATCH", details).
-        throw new UnsupportedOperationException("TICKET-ADV033");
-    }
-
-    /** TICKET-ADV018 — exhaustive switch over the sealed hierarchy. */
-    private BigDecimal[] priceQty(TradeType t) {
-        // TODO(TICKET-ADV018): switch over the sealed TradeType hierarchy
-        //   (EquityTrade, FXTrade, BondTrade, DerivativeTrade) and return a
-        //   BigDecimal[]{price, qty}. The compiler enforces exhaustiveness —
-        //   omit a case and the build fails.
-        throw new UnsupportedOperationException("TICKET-ADV018");
     }
 }
