@@ -68,6 +68,7 @@ server:
 
 # =============================================================================
 # TICKET-ADV083-ADV086 / ADV097 — Actuator + Prometheus exposure
+# histogram metric added
 #  Custom metrics registered by com.dbtraining.reconx.observability.TradeMetrics
 #  scrape via /actuator/prometheus.
 # =============================================================================
