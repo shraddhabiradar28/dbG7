@@ -1,0 +1,46 @@
+package com.dbtraining.reconx.config;
+
+import com.github.benmanes.caffeine.cache.Caffeine;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.caffeine.CaffeineCache;
+import org.springframework.cache.support.SimpleCacheManager;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * TICKET-ADV082 — per-cache Caffeine policies.
+ *
+ * The single spring.cache.caffeine.spec property in application.yml applies
+ * one policy to every named cache; instruments and counterparties age at
+ * different rates, so this bean gives each its own TTL. recordStats() is
+ * what lets Micrometer expose cache_gets_total to Prometheus (ADV087/097).
+ *
+ * @EnableCaching is already on ReconxApplication (ADV081).
+ */
+@Configuration
+public class CacheConfig {
+
+    @Bean
+    public CacheManager cacheManager() {
+        CaffeineCache instruments = new CaffeineCache("instruments",
+                Caffeine.newBuilder()
+                        .maximumSize(500)
+                        .expireAfterWrite(5, TimeUnit.MINUTES)
+                        .recordStats()
+                        .build());
+
+        CaffeineCache counterparties = new CaffeineCache("counterparties",
+                Caffeine.newBuilder()
+                        .maximumSize(200)
+                        .expireAfterWrite(1, TimeUnit.MINUTES)
+                        .recordStats()
+                        .build());
+
+        SimpleCacheManager manager = new SimpleCacheManager();
+        manager.setCaches(List.of(instruments, counterparties));
+        return manager;
+    }
+}
