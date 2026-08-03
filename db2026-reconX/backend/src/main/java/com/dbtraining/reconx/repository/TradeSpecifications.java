@@ -3,7 +3,7 @@ package com.dbtraining.reconx.repository;
 import com.dbtraining.reconx.repository.entity.Trade;
 import org.springframework.data.jpa.domain.Specification;
 
-import com.dbtraining.reconx.repository.entity.Trade;
+import java.time.LocalDate;
 
 public final class TradeSpecifications {
 
@@ -22,21 +22,6 @@ public final class TradeSpecifications {
         return (root, q, cb) -> status == null || status.isBlank()
                 ? cb.conjunction()
                 : cb.equal(root.get("status"), status);
-    }
-
-    public static Specification<Trade> tradeDateBetween(LocalDate from, LocalDate to) {
-        return (root, query, cb) -> {
-            if (from == null && to == null) {
-                return cb.conjunction();
-            }
-            if (from == null) {
-                return cb.lessThanOrEqualTo(root.get("tradeDate"), to);
-            }
-            if (to == null) {
-                return cb.greaterThanOrEqualTo(root.get("tradeDate"), from);
-            }
-            return cb.between(root.get("tradeDate"), from, to);
-        };
     }
 
     public static Specification<Trade> hasCounterparty(Long counterpartyId) {

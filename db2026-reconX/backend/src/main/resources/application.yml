@@ -37,11 +37,13 @@ spring:
       mode: never
 
 
-  # ADV081-ADV082 — Caffeine cache config; per-cache spec overrides the global one.
+  # ADV081-ADV082 — Caffeine cache config. Per-cache TTLs (instruments 5m,
+  # counterparties 1m) come from the CacheManager @Bean in CacheConfig, which
+  # supersedes this block entirely once defined — Boot's cache autoconfiguration
+  # backs off in favour of a user-supplied CacheManager. Left here only as a
+  # record of the Day-1 single-spec default that CacheConfig replaces.
   cache:
     cache-names: instruments,counterparties
-    caffeine:
-      spec: maximumSize=500, expireAfterWrite=5m
 
   # ADV128 — Kafka producer/consumer defaults. Topics are created at startup
   # by KafkaTopicsConfig (see com.dbtraining.reconx.kafka.KafkaTopicsConfig).
@@ -77,7 +79,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus,env,loggers
+        include: health,info,metrics,prometheus,env,loggers,caches
       base-path: /actuator
   endpoint:
     health:
