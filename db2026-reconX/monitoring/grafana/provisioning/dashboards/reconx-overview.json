@@ -42,6 +42,34 @@
       "datasource": { "type": "prometheus", "uid": "reconx-prometheus" },
       "targets": [{ "expr": "sum(rate(reconciliation_duration_seconds_bucket[5m])) by (le)" }],
       "gridPos": { "h": 8, "w": 24, "x": 0, "y": 16 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Consumer lag by topic (ADV141)",
+      "datasource": { "type": "prometheus", "uid": "reconx-prometheus" },
+      "targets": [
+        { "expr": "sum(kafka_consumer_records_lag{topic=~\".*\"}) by (topic)", "legendFormat": "{{topic}}" }
+      ],
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 24 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Throughput: produced vs consumed (ADV140)",
+      "datasource": { "type": "prometheus", "uid": "reconx-prometheus" },
+      "targets": [
+        { "expr": "sum(rate(kafka_consumer_records_consumed_total[1m]))", "legendFormat": "consumed" },
+        { "expr": "sum(rate(kafka_producer_record_send_total[1m]))", "legendFormat": "produced" }
+      ],
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 24 }
+    },
+    {
+      "type": "stat",
+      "title": "DLQ message count (ADV142)",
+      "datasource": { "type": "prometheus", "uid": "reconx-prometheus" },
+      "targets": [
+        { "expr": "sum(kafka_consumer_records_consumed_total{topic=\"trade-events-dlq\"})" }
+      ],
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 24 }
     }
   ],
   "refresh": "10s",
