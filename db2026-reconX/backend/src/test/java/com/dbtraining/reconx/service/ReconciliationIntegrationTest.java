@@ -23,6 +23,7 @@ class ReconciliationIntegrationTest {
         r.add("spring.datasource.url", postgres::getJdbcUrl);
         r.add("spring.datasource.username", postgres::getUsername);
         r.add("spring.datasource.password", postgres::getPassword);
+        r.add("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
     }
 
     @Test
