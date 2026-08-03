@@ -7,7 +7,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 
 /**
@@ -37,14 +36,12 @@ public class AuditLogEntry {
     @Column(length = 100)
     private String actor;
 
-    // Use explicit LOB mapping so Hibernate validation matches the DB schema
+    // Use TEXT mapping so Hibernate validation matches the Liquibase schema
     // for large state payloads in both H2 (Postgres mode) and Postgres.
-    @Lob
-    @Column(name = "before_state")
+    @Column(name = "before_state", columnDefinition = "TEXT")
     private String beforeState;
 
-    @Lob
-    @Column(name = "after_state")
+    @Column(name = "after_state", columnDefinition = "TEXT")
     private String afterState;
 
     public AuditLogEntry() {}

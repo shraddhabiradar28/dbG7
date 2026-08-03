@@ -11,13 +11,6 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 import java.util.Optional;
 
-/**
- * ============================================================================
- * TICKET-ADV055 — Custom JPQL filter query
- * TICKET-ADV056 — Specification-based dynamic queries (JpaSpecificationExecutor)
- * TICKET-ADV057 — Pageable / Page<T> for paginated list endpoints
- * ============================================================================
- */
 public interface TradeRepository
         extends JpaRepository<Trade, Long>, JpaSpecificationExecutor<Trade> {
 
@@ -27,11 +20,15 @@ public interface TradeRepository
         SELECT t FROM Trade t
         WHERE t.tradeDate BETWEEN :from AND :to
           AND (:status IS NULL OR t.status = :status)
+          AND (:counterpartyId IS NULL OR t.counterparty.id = :counterpartyId)
         """)
-    Page<Trade> findByFilters(@Param("from") LocalDate from,
-                              @Param("to") LocalDate to,
-                              @Param("status") String status,
-                              Pageable pageable);
+    Page<Trade> findByFilters(
+        @Param("from")           LocalDate from,
+        @Param("to")             LocalDate to,
+        @Param("status")         String status,
+        @Param("counterpartyId") Long counterpartyId,
+        Pageable pageable
+    );
 
     long countByStatus(String status);
 }
