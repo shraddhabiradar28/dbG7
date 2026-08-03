@@ -12,23 +12,39 @@ class EquityTradeTest {
 
     @Test
     void builder_buildsWhenAllRequiredPresent() {
-        // TODO(TICKET-ADV019): build an EquityTrade via the Builder with all required fields,
-        //                     then assert tradeRef, notional (price*qty) and assetClass = EQUITY.
-        org.junit.jupiter.api.Assertions.fail("TICKET-ADV019 not implemented yet");
+        EquityTrade trade = sampleEquity("EQU-20260603-0001");
+
+        assertThat(trade.tradeRef()).isEqualTo(TradeRef.of("EQU-20260603-0001"));
+        // notional = quantity * price = 100 * 100
+        assertThat(trade.notional().amount()).isEqualByComparingTo("10000");
+        assertThat(trade.notional().currency().getCurrencyCode()).isEqualTo("EUR");
+        assertThat(trade.assetClass()).isEqualTo(TradeType.AssetClass.EQUITY);
     }
 
     @Test
     void builder_missingPrice_throws() {
-        // TODO(TICKET-ADV019): omit .price(...) on the Builder and assert build() throws
-        //                     NullPointerException whose message mentions "price".
-        org.junit.jupiter.api.Assertions.fail("TICKET-ADV019 not implemented yet");
+        EquityTrade.Builder builder = EquityTrade.builder()
+                .tradeRef(TradeRef.of("EQU-20260603-0002"))
+                .instrumentSymbol("SAP.DE")
+                .quantity(new BigDecimal("100"))
+                .currency("EUR").side(Side.BUY)
+                .tradeDate(LocalDate.of(2026, 6, 3))
+                .counterpartyId(1L);
+
+        assertThatThrownBy(builder::build)
+                .isInstanceOf(NullPointerException.class)
+                .hasMessageContaining("price");
     }
 
     @Test
     void equality_byTradeRef() {
-        // TODO(TICKET-ADV028): two EquityTrades with the same tradeRef are equal and share hashCode;
-        //                     a third with a different tradeRef is not equal.
-        org.junit.jupiter.api.Assertions.fail("TICKET-ADV028 not implemented yet");
+        EquityTrade first  = sampleEquity("EQU-20260603-0001");
+        EquityTrade second = sampleEquity("EQU-20260603-0001");
+        EquityTrade other  = sampleEquity("EQU-20260603-9999");
+
+        assertThat(first).isEqualTo(second);
+        assertThat(first).hasSameHashCodeAs(second);
+        assertThat(first).isNotEqualTo(other);
     }
 
     private EquityTrade sampleEquity(String ref) {

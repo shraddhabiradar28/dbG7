@@ -43,6 +43,8 @@ public record Money(BigDecimal amount, Currency currency) {
     public Money plus(Money other) {
         Objects.requireNonNull(other);
         if (!this.currency.equals(other.currency())) {
+        Objects.requireNonNull(other, "other");
+        if (!this.currency.equals(other.currency)) {
             throw new IllegalArgumentException(
                     "Cannot add %s to %s — currency mismatch".formatted(other.currency(), this.currency));
         }
@@ -51,6 +53,10 @@ public record Money(BigDecimal amount, Currency currency) {
 
     public Money times(BigDecimal multiplier) {
         Objects.requireNonNull(multiplier, "multiplier");
+        return new Money(this.amount.add(other.amount), this.currency);
+    }
+
+    public Money times(BigDecimal multiplier) {
         return new Money(this.amount.multiply(multiplier), this.currency);
     }
 }

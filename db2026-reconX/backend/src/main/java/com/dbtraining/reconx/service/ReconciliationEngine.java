@@ -11,6 +11,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -34,6 +37,17 @@ import java.util.stream.Collectors;
  */
 @Service
 public class ReconciliationEngine {
+    private final ExecutorService executor;
+
+    public ReconciliationEngine() {
+        int threads = Math.max(1, Runtime.getRuntime().availableProcessors());
+        AtomicInteger threadCounter = new AtomicInteger(1);
+        this.executor = Executors.newFixedThreadPool(threads, runnable -> {
+            Thread thread = new Thread(runnable);
+            thread.setName("recon-by-cp-" + threadCounter.getAndIncrement());
+            return thread;
+        });
+    }
 
     private final ReconConfigMBean reconConfigMBean;
 
@@ -58,6 +72,21 @@ public class ReconciliationEngine {
         //         .map(in -> matchOne(in, externalByRef.get(in.tradeRef().value()), rule))
         //         .toList();
         throw new UnsupportedOperationException("TICKET-ADV033");
+        if (internal == null || internal.isEmpty()) {
+            return List.of();
+        }
+
+        Map<String, TradeType> externalByRef = (external == null ? List.<TradeType>of() : external)
+                .stream()
+                .collect(Collectors.toMap(
+                        trade -> trade.tradeRef().value(),
+                        Function.identity(),
+                        (left, right) -> left
+                ));
+
+        return internal.parallelStream()
+                .map(in -> matchOne(in, externalByRef.get(in.tradeRef().value()), rule))
+                .toList();
     }
 
     /**
@@ -69,11 +98,27 @@ public class ReconciliationEngine {
             Map<Long, List<TradeType>> internalByCp,
             Map<Long, List<TradeType>> externalByCp,
             ReconciliationRule rule) {
-        // TODO(TICKET-ADV037): for each counterparty key in internalByCp launch a
-        //   CompletableFuture.supplyAsync(() -> reconcile(...)). Combine via
-        //   CompletableFuture.allOf(...).thenApply(v -> futures.stream()
-        //       .flatMap(f -> f.join().stream()).toList()).
-        throw new UnsupportedOperationException("TICKET-ADV037");
+        if (internalByCp == null || internalByCp.isEmpty()) {
+            return CompletableFuture.completedFuture(List.of());
+        }
+
+        Map<Long, List<TradeType>> safeExternalByCp = externalByCp == null ? Map.of() : externalByCp;
+
+        List<CompletableFuture<List<ReconResult>>> futures = internalByCp.entrySet().stream()
+                .map(entry -> CompletableFuture.supplyAsync(
+                        () -> reconcile(entry.getValue(), safeExternalByCp.getOrDefault(entry.getKey(), List.of()), rule),
+                        executor
+                ))
+                .toList();
+
+        return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new))
+                .thenApply(ignored -> futures.stream()
+                        .flatMap(future -> future.join().stream())
+                        .toList());
+    }
+
+    public void shutdown() {
+        executor.shutdown();
     }
 
     private ReconResult matchOne(TradeType internal, TradeType external, ReconciliationRule rule) {
@@ -82,14 +127,37 @@ public class ReconciliationEngine {
         //   Otherwise pull priceQty() for both sides, compare via rule.matches(...),
         //   return ReconResult.matched(ref) or breakResult(ref, "VALUE_MISMATCH", details).
         throw new UnsupportedOperationException("TICKET-ADV033");
+        String ref = internal.tradeRef().value();
+        if (external == null) {
+            return ReconResult.breakResult(ref, "MISSING_EXTERNAL", "No external trade found for " + ref);
+        }
+
+        BigDecimal[] internalPair = priceQty(internal);
+        BigDecimal[] externalPair = priceQty(external);
+        if (rule.matches(internalPair[0], internalPair[1], externalPair[0], externalPair[1])) {
+            return ReconResult.matched(ref);
+        }
+
+        return ReconResult.breakResult(
+                ref,
+                "VALUE_MISMATCH",
+                "internal=%s/%s external=%s/%s".formatted(
+                        internalPair[0], internalPair[1], externalPair[0], externalPair[1]
+                )
+        );
     }
 
     /** TICKET-ADV018 — exhaustive switch over the sealed hierarchy. */
     private BigDecimal[] priceQty(TradeType t) {
-        // TODO(TICKET-ADV018): switch over the sealed TradeType hierarchy
-        //   (EquityTrade, FXTrade, BondTrade, DerivativeTrade) and return a
-        //   BigDecimal[]{price, qty}. The compiler enforces exhaustiveness —
-        //   omit a case and the build fails.
-        throw new UnsupportedOperationException("TICKET-ADV018");
+        return switch (t) {
+            case com.dbtraining.reconx.model.EquityTrade equity ->
+                    new BigDecimal[]{equity.price(), equity.quantity()};
+            case com.dbtraining.reconx.model.FXTrade fx ->
+                    new BigDecimal[]{fx.fxRate(), fx.notionalCcy1()};
+            case com.dbtraining.reconx.model.BondTrade bond ->
+                    new BigDecimal[]{bond.couponRate(), bond.faceValue()};
+            case com.dbtraining.reconx.model.DerivativeTrade derivative ->
+                    new BigDecimal[]{derivative.strike(), derivative.quantity()};
+        };
     }
 }

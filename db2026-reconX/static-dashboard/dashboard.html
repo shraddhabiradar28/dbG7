@@ -11,6 +11,14 @@ TICKET-ADV100 — ARIA roles + aria-live for the trade feed
   <meta charset="utf-8" />
   <title>ReconX (static) — Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- TICKET-ADV100 — inline, before the stylesheet, so data-theme is set
+       before first paint: no flash of the wrong theme on reload. -->
+  <script>
+    (function () {
+      var stored = localStorage.getItem('reconx-theme') || 'light';
+      document.documentElement.setAttribute('data-theme', stored);
+    })();
+  </script>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -21,7 +29,7 @@ TICKET-ADV100 — ARIA roles + aria-live for the trade feed
       <a href="trades.html">Trades</a>
       <a href="recon.html">Recon</a>
     </nav>
-    <button id="theme-toggle" aria-label="Toggle light/dark theme">🌗</button>
+    <button id="theme-toggle" aria-label="Toggle light/dark theme" aria-pressed="false">🌗</button>
   </header>
 
   <aside class="layout__sidebar" role="complementary">
