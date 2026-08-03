@@ -3,7 +3,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { withAuth } from '@components/withAuth.jsx';
+import { withAuth } from '@hocs/withAuth.jsx';
 import { api } from '@services/apiService.js';
 
 // TODO(TICKET-ADV123): build a yup.object schema covering every field on the

@@ -28,4 +28,4 @@ groups:
         labels:
           severity: critical
         annotations:
-          summary: "Messages landing in trade-events-dlq"
+          summary: "Messages landing in trade-events-dlq" 
