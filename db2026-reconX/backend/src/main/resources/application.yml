@@ -65,8 +65,16 @@ spring:
         spring.json.trusted.packages: com.dbtraining.reconx.dto
         spring.json.use.type.headers: false
         spring.json.value.default.type: com.dbtraining.reconx.dto.TradeEvent
-        metric.reporters: io.micrometer.core.instrument.binder.kafka.KafkaClientMetrics
-        
+        # NOTE: do NOT add
+        #   metric.reporters: io.micrometer...binder.kafka.KafkaClientMetrics
+        # here. KafkaClientMetrics is a Micrometer MeterBinder, not an
+        # org.apache.kafka.common.metrics.MetricsReporter. Kafka tries to
+        # instantiate it as a reporter, that fails, and consumer construction
+        # then NPEs on a null clientTelemetryReporter -- which prevents the
+        # whole application from starting. Micrometer's Kafka client metrics
+        # are already enabled via management.metrics.binders.kafka.enabled
+        # below, which is the supported wiring.
+
     listener:
       # Prevent startup failure when Kafka isn't reachable in dev/test
       missing-topics-fatal: false
