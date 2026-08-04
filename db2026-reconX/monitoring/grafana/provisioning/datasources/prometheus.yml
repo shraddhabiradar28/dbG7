@@ -1,4 +1,4 @@
-# TICKET-ADV150 — Auto-provision the Prometheus datasource
+# DONE: TICKET-ADV150 — Auto-provision the Prometheus datasource
 apiVersion: 1
 datasources:
   - name: Prometheus

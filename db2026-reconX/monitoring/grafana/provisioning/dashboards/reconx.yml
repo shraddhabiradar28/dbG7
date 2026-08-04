@@ -1,4 +1,4 @@
-# TICKET-ADV150 — Provider definition: load every dashboard JSON in /dashboards
+# DONE: TICKET-ADV150 — Provider definition: load every dashboard JSON in /dashboards
 apiVersion: 1
 providers:
   - name: reconx
