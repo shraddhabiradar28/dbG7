@@ -9,8 +9,6 @@ import com.dbtraining.reconx.observability.TradeMetrics;
 import com.dbtraining.reconx.repository.CounterpartyRepository;
 import com.dbtraining.reconx.repository.InstrumentRepository;
 import com.dbtraining.reconx.repository.TradeRepository;
-import com.dbtraining.reconx.repository.entity.Counterparty;
-import com.dbtraining.reconx.repository.entity.Instrument;
 import com.dbtraining.reconx.repository.entity.Trade;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

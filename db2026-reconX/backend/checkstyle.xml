@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+    "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+    "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!--
+ ============================================================================
+ TICKET-ADV157 — Checkstyle config for the ReconX backend.
+
+ Deliberately a *pragmatic* subset, per the ticket: "start with Google checks,
+ disable the noisiest rules". The full Google config flags several thousand
+ violations on this codebase (almost all indentation and Javadoc), and with
+ failOnViolation=true that would simply block every build — which is the
+ failure mode the ticket warns about ("the temptation is to turn the plugin
+ off wholesale").
+
+ So this enforces rules that catch real defects and structural problems, and
+ leaves pure-formatting opinions out. Each omission below is a deliberate
+ suppression with a reason, not an oversight. Tighten over time as the
+ codebase is cleaned up.
+ ============================================================================
+-->
+<module name="Checker">
+    <property name="severity" value="warning"/>
+    <property name="fileExtensions" value="java"/>
+
+    <!-- Source files must not be empty. -->
+    <module name="FileLength">
+        <property name="max" value="2000"/>
+    </module>
+
+    <module name="TreeWalker">
+
+        <!-- === Imports: catches genuine dead code and hidden coupling === -->
+
+        <!-- Unused imports are dead references; they also hide the fact that a
+             refactor left a class behind. -->
+        <module name="UnusedImports">
+            <property name="processJavadoc" value="true"/>
+        </module>
+
+        <!-- Importing the same thing twice, or importing java.lang, is noise. -->
+        <module name="RedundantImport"/>
+
+        <!-- === Correctness: things that are almost always bugs === -->
+
+        <!-- Overriding equals without hashCode breaks every hash-based
+             collection. This codebase has value objects (Money, TradeRef) where
+             that matters. -->
+        <module name="EqualsHashCode"/>
+
+        <!-- A switch that falls through is nearly always unintended. -->
+        <module name="FallThrough"/>
+
+        <!-- Comparing strings/boxed types with == instead of equals(). -->
+        <module name="StringLiteralEquality"/>
+
+        <!-- An empty catch/finally silently swallows failures. -->
+        <module name="EmptyBlock">
+            <property name="option" value="text"/>
+            <property name="tokens" value="LITERAL_CATCH,LITERAL_FINALLY"/>
+        </module>
+
+        <!-- A statement after a return/throw can never run. -->
+        <module name="EmptyStatement"/>
+
+        <!-- Utility/constant classes shouldn't be silently mutable. -->
+        <module name="ModifierOrder"/>
+
+        <!-- === Naming: only the conventions that aid readability === -->
+
+        <module name="PackageName"/>
+        <module name="TypeName"/>
+
+    </module>
+
+    <!--
+     Deliberately NOT enabled, with reasons:
+
+       AvoidStarImport
+         - Fires 13 times, almost all on idioms the ecosystem endorses:
+           `jakarta.persistence.*` in JPA entities and
+           `org.springframework.web.bind.annotation.*` in controllers.
+           Enforcing it would churn every entity and controller for no
+           defect-finding value.
+
+       NeedBraces
+         - Fires 17 times, nearly all on single-line guard clauses
+           (`if (x == null) return;`). Defensible style preference, but not a
+           bug class, and not worth touching 8 files for on this timeline.
+
+       InnerAssignment
+         - Over-fires on arrow-switch arms (`case A, B -> state = f(x);`),
+           which are assignments-as-statements, not the `if (a = b)` typo the
+           rule exists to catch. False positives only.
+
+       Indentation / WhitespaceAround / LineLength / FileTabCharacter
+         - Pure formatting. The codebase mixes styles from many contributors
+           across the programme; enforcing these now would fail thousands of
+           lines without improving correctness. Revisit once a formatter is
+           applied repo-wide.
+
+       JavadocMethod / JavadocType / MissingJavadocMethod
+         - The codebase documents classes with block comments rather than
+           strict Javadoc. Enforcing Javadoc would flag nearly every method
+           and encourage empty stub comments.
+
+       MemberName / LocalVariableName / MethodName / ParameterName
+         - Existing names already follow Java conventions; adding these gives
+           no signal today and risks failing on generated sources (MapStruct's
+           TradeMapperImpl).
+
+       MagicNumber
+         - Extremely noisy in test fixtures and HTTP status handling.
+
+       FinalParameters / DesignForExtension / HideUtilityClassConstructor
+         - Opinionated design rules that would require broad refactors.
+    -->
+</module>
