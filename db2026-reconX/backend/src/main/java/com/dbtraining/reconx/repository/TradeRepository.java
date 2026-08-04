@@ -1,5 +1,6 @@
 package com.dbtraining.reconx.repository;
 
+import com.dbtraining.reconx.repository.entity.Trade;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,8 +25,10 @@ public interface TradeRepository
     Page<Trade> findByFilters(
         @Param("from")           LocalDate from,
         @Param("to")             LocalDate to,
-        @Param("status")         TradeStatus status,
+        @Param("status")         String status,
         @Param("counterpartyId") Long counterpartyId,
         Pageable pageable
     );
+
+    long countByStatus(String status);
 }
