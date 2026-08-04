@@ -1,4 +1,4 @@
-# TICKET-ADV149 — Prometheus scrape config
+# DONE: TICKET-ADV149 — Prometheus scrape config
 global:
   scrape_interval: 10s
   evaluation_interval: 10s
