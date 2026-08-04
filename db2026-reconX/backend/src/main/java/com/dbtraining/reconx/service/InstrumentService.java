@@ -1,5 +1,6 @@
 package com.dbtraining.reconx.service;
 
+
 import com.dbtraining.reconx.exception.InvalidTradeException;
 import com.dbtraining.reconx.repository.InstrumentRepository;
 import com.dbtraining.reconx.repository.entity.Instrument;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class InstrumentService {
 
+    
     private static final Logger log = LoggerFactory.getLogger(InstrumentService.class);
 
     private final InstrumentRepository repo;

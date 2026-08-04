@@ -37,6 +37,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
 
+import java.net.URI;
+import java.time.LocalDate;
+import java.util.Map;
 
 /**
  * ============================================================================
@@ -62,6 +65,17 @@ public class TradeController {
         this.mapper = mapper;
     }
 
+    @GetMapping
+    @Operation(summary = "List trades — paginated, filterable, sortable")
+    public PagedResponse<TradeResponse> list(
+            @RequestParam(required = false) LocalDate from,
+            @RequestParam(required = false) LocalDate to,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Long counterpartyId,
+            @PageableDefault(size = 20, sort = "tradeDate", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<Trade> page = service.list(from, to, status, counterpartyId, pageable);
+        return PagedResponse.from(page, mapper::toResponse);
+    }
     // @GetMapping
     // @Operation(summary = "List trades — paginated, filterable, sortable")
     // public PagedResponse<TradeResponse> list(
@@ -78,38 +92,23 @@ public class TradeController {
     //     //   "no trades match" while the JPA + Specifications work is still pending.
     //     return new PagedResponse<>(List.of(), 0, 20, 0, 0);
     // }
-@GetMapping
-@Operation(summary = "List trades — paginated, filterable, sortable")
-public PagedResponse<TradeResponse> list(
-        @RequestParam(required = false) LocalDate from,
-        @RequestParam(required = false) LocalDate to,
-        @RequestParam(required = false) String status,
-        @RequestParam(required = false) Long counterpartyId,
-        @PageableDefault(size = 20, sort = "tradeDate", direction = Sort.Direction.DESC) Pageable pageable) {
-    Page<Trade> page = service.list(from, to, status, counterpartyId, pageable);
-    return PagedResponse.from(page, mapper::toResponse);
-}
 
   
     @PostMapping
-@Operation(summary = "Create a trade")
-public ResponseEntity<TradeResponse> create(@Valid @RequestBody TradeRequest req,
-                                            @AuthenticationPrincipal Object principal) {
-    String actor = String.valueOf(principal);
-    Trade saved = service.create(req, actor);
-    return ResponseEntity
-            .created(URI.create("/api/v1/trades/" + saved.getId()))
-            .body(mapper.toResponse(saved));
-}
+    @Operation(summary = "Create a trade")
+    public ResponseEntity<TradeResponse> create(@Valid @RequestBody TradeRequest req,
+                                                @AuthenticationPrincipal String actor) {
+        Trade saved = service.create(req, actor);
+        URI location = URI.create("/api/v1/trades/" + saved.getId());
+        return ResponseEntity.created(location).body(mapper.toResponse(saved));
+    }
 
-
-@PutMapping("/{id}")
-@Operation(summary = "Full update of a trade")
-public TradeResponse update(@PathVariable Long id, @Valid @RequestBody TradeRequest req,
-                            @AuthenticationPrincipal Object principal) {
-    return mapper.toResponse(service.update(id, req, String.valueOf(principal)));
-}
-
+    @PutMapping("/{id}")
+    @Operation(summary = "Full update of a trade")
+    public TradeResponse update(@PathVariable Long id, @Valid @RequestBody TradeRequest req,
+                                @AuthenticationPrincipal String actor) {
+        return mapper.toResponse(service.update(id, req, actor));
+    }
     // @PatchMapping("/{id}/status")
     // @Operation(summary = "Update only the status field")
     // public TradeResponse updateStatus(@PathVariable Long id,
@@ -120,26 +119,20 @@ public TradeResponse update(@PathVariable Long id, @Valid @RequestBody TradeRequ
     //     throw new UnsupportedOperationException("TICKET-ADV066");
     // }
     @PatchMapping("/{id}/status")
-@Operation(summary = "Update only the status field")
-public TradeResponse updateStatus(@PathVariable Long id,
-                                  @RequestBody Map<String, String> body,
-                                  @AuthenticationPrincipal Object principal) {
-    String status = body.get("status");
-    return mapper.toResponse(service.updateStatus(id, status, String.valueOf(principal)));
-}
-
+    @Operation(summary = "Update only the status field")
+    public TradeResponse updateStatus(@PathVariable Long id,
+                                      @RequestBody Map<String, String> body,
+                                      @AuthenticationPrincipal String actor) {
+        return mapper.toResponse(service.updateStatus(id, body.get("status"), actor));
+    }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Soft delete (sets deleted_at)")
-    public ResponseEntity<Void> delete(
-            @PathVariable Long id,
-            @AuthenticationPrincipal String actor) {
-
+    public ResponseEntity<Void> delete(@PathVariable Long id,
+                                       @AuthenticationPrincipal String actor) {
         service.softDelete(id, actor);
-
         return ResponseEntity.noContent().build();
     }
-
 
     @Deprecated(
             since = "v1.4.0",

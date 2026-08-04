@@ -1,7 +1,8 @@
-// useMemo for portfolio-value calc.
-// useTradeStream live feed.
+// TICKET-ADV120 — useMemo for portfolio-value calc.
+// TICKET-ADV116 — useTradeStream live feed.
 import React, { useMemo } from 'react';
-import { withAuth } from '@components/withAuth.jsx';
+import { withAuth } from '@hocs/withAuth.jsx';
+import { withErrorBoundary } from '@hocs/withErrorBoundary.jsx';
 import { useTradeStream } from '@hooks/useTradeStream.js';
 
 function StatCard({ label, value }) {
@@ -40,4 +41,4 @@ function Dashboard() {
   );
 }
 
-export default withAuth(Dashboard);
+export default withErrorBoundary(withAuth(Dashboard));
