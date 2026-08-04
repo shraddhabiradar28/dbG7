@@ -11,7 +11,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.dbtraining</groupId>
+    <groupId>com.dbtraining.reconx</groupId>
     <artifactId>recon-audit-starter</artifactId>
     <version>1.0.0</version>
     <name>recon-audit-starter</name>
@@ -22,6 +22,10 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
