@@ -31,18 +31,26 @@ class ReconciliationEngineTest {
         // then
         assertThat(results).hasSize(1);
         assertThat(results.get(0).status()).isEqualTo(ReconResult.Status.MATCHED);
+        assertThat(results.get(0).tradeRef()).isEqualTo("EQU-20260603-0001");
     }
 
     @Test
-    @Test
     void testReconcile_priceTolerance_withinThreshold() {
-        EquityTrade internal = equity("EQU-20260603-0002", "100.00", "1000");
-        EquityTrade external = equity("EQU-20260603-0002", "100.50", "1000");
+        ReconciliationEngine engine = new ReconciliationEngine();
+        try {
+            EquityTrade internal = equity("EQU-20260603-0002", "100.00", "10", 1L);
+            EquityTrade external = equity("EQU-20260603-0002", "100.50", "10", 1L);
 
-        List<ReconResult> out = engine.reconcile(List.of(internal), List.of(external),
-                ReconciliationRule.PRICE_TOLERANCE_1PCT);
+            List<ReconResult> results = engine.reconcile(List.of(internal), List.of(external),
+                    ReconciliationRule.PRICE_TOLERANCE_1PCT);
 
-        assertThat(out.get(0).status()).isEqualTo(ReconResult.Status.MATCHED);
+            assertThat(results)
+                    .singleElement()
+                    .extracting(ReconResult::status)
+                    .isEqualTo(ReconResult.Status.MATCHED);
+        } finally {
+            engine.shutdown();
+        }
     }
 
     @Test
@@ -66,6 +74,37 @@ class ReconciliationEngineTest {
 
     @Test
     void testReconcile_emptyInternal_returnsEmpty() {
+        assertThat(engine.reconcile(List.of(), List.of(), ReconciliationRule.EXACT)).isEmpty();
+    }
+
+    @Test
+    void testReconcile_singleInternalNoExternal_returnsBreak() {
+        EquityTrade internal = equity("EQU-20260603-0004", "100.00", "1000", 1L);
+
+        List<ReconResult> out = engine.reconcile(List.of(internal), List.of(), ReconciliationRule.EXACT);
+
+        assertThat(out).hasSize(1);
+        assertThat(out.get(0).status()).isEqualTo(ReconResult.Status.BREAK);
+        assertThat(out.get(0).discrepancyType()).isEqualTo("MISSING_EXTERNAL");
+    }
+
+    @Test
+    void testReconcile_allMismatched_summaryShowsZeroMatched() {
+        List<TradeType> internals = List.of(
+                equity("EQU-20260603-0005", "100.00", "1000", 1L),
+                equity("EQU-20260603-0006", "100.00", "1000", 1L),
+                equity("EQU-20260603-0007", "100.00", "1000", 1L));
+        List<TradeType> externals = List.of(
+                equity("EQU-20260603-0005", "200.00", "1000", 1L),
+                equity("EQU-20260603-0006", "200.00", "1000", 1L),
+                equity("EQU-20260603-0007", "200.00", "1000", 1L));
+
+        List<ReconResult> out = engine.reconcile(internals, externals, ReconciliationRule.EXACT);
+        ReconSummary summary = out.stream().collect(new ReconSummaryCollector());
+
+        assertThat(summary.total()).isEqualTo(3);
+        assertThat(summary.matched()).isEqualTo(0);
+        assertThat(summary.broken()).isEqualTo(3);
         ReconciliationEngine engine = new ReconciliationEngine();
         try {
             assertThat(engine.reconcile(List.of(), List.of(), ReconciliationRule.EXACT)).isEmpty();

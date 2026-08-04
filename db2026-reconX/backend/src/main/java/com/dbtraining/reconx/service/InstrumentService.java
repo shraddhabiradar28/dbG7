@@ -1,6 +1,7 @@
 package com.dbtraining.reconx.service;
 
 
+import com.dbtraining.reconx.exception.InvalidTradeException;
 import com.dbtraining.reconx.repository.InstrumentRepository;
 import com.dbtraining.reconx.repository.entity.Instrument;
 import org.slf4j.Logger;
@@ -26,11 +27,6 @@ public class InstrumentService {
 
     @Cacheable("instruments")
     public Instrument findBySymbol(String symbol) {
-        
-        //   .orElseThrow(() -> new InvalidTradeException("Unknown instrument symbol: " + symbol)).
-        //   The @Cacheable annotation above is what makes the second call cheap —
-        //   verify the cache hit-rate via /actuator/caches once you wire this up.
-        throw new UnsupportedOperationException("TICKET-ADV081");
         log.info("DB hit for {}", symbol);
         return repo.findBySymbol(symbol)
                 .orElseThrow(() -> new InvalidTradeException("Unknown instrument symbol: " + symbol));
