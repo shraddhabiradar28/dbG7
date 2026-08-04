@@ -18,24 +18,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * ============================================================================
- * TICKET-ADV033 — ReconciliationEngine using Streams (parallel matching)
- * TICKET-ADV037 — CompletableFuture: parallel recon by counterparty
- * TICKET-ADV047 — Edge cases: empty/single/all-mismatched inputs handled
- * TICKET-ADV084 — @Timed exports reconciliation_duration_seconds histogram
- *
- * WHAT:    Compares internal trades against external (counterparty) trades and
- *          returns a ReconResult per internal trade (MATCHED or BREAK).
- * HOW:     Index externals by tradeRef, then stream internals and look each
- *          up. CompletableFuture variant batches by counterparty for
- *          throughput on large books.
- * WHY:     This is the spine of the product. Everything else (REST API,
- *          Kafka consumers, dashboard) ultimately calls into here.
- * OBSERVE: Histogram appears at /actuator/prometheus under
- *          reconciliation_duration_seconds.
- * ============================================================================
- */
 @Service
 public class ReconciliationEngine {
     private final ExecutorService executor;
@@ -133,17 +115,12 @@ public class ReconciliationEngine {
         );
     }
 
-    /** TICKET-ADV018 — exhaustive switch over the sealed hierarchy. */
     private BigDecimal[] priceQty(TradeType t) {
         return switch (t) {
-            case com.dbtraining.reconx.model.EquityTrade equity ->
-                    new BigDecimal[]{equity.price(), equity.quantity()};
-            case com.dbtraining.reconx.model.FXTrade fx ->
-                    new BigDecimal[]{fx.fxRate(), fx.notionalCcy1()};
-            case com.dbtraining.reconx.model.BondTrade bond ->
-                    new BigDecimal[]{bond.couponRate(), bond.faceValue()};
-            case com.dbtraining.reconx.model.DerivativeTrade derivative ->
-                    new BigDecimal[]{derivative.strike(), derivative.quantity()};
+            case com.dbtraining.reconx.model.EquityTrade e     -> new BigDecimal[]{e.price(),  e.quantity()};
+            case com.dbtraining.reconx.model.FXTrade fx        -> new BigDecimal[]{fx.fxRate(), fx.notionalCcy1()};
+            case com.dbtraining.reconx.model.BondTrade b       -> new BigDecimal[]{b.couponRate(), b.faceValue()};
+            case com.dbtraining.reconx.model.DerivativeTrade d -> new BigDecimal[]{d.strike(), d.quantity()};
         };
     }
 }

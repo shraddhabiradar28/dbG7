@@ -31,6 +31,7 @@ class ReconciliationEngineTest {
         // then
         assertThat(results).hasSize(1);
         assertThat(results.get(0).status()).isEqualTo(ReconResult.Status.MATCHED);
+        assertThat(results.get(0).tradeRef()).isEqualTo("EQU-20260603-0001");
     }
 
     @Test
@@ -71,7 +72,7 @@ class ReconciliationEngineTest {
         }
     }
 
-   @Test
+    @Test
     void testReconcile_emptyInternal_returnsEmpty() {
         assertThat(engine.reconcile(List.of(), List.of(), ReconciliationRule.EXACT)).isEmpty();
     }
