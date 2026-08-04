@@ -1,5 +1,8 @@
 # =============================================================================
 # TICKET-ADV049 — uat profile: PostgreSQL on docker-compose
+# TICKET-ADV151 — ddl-auto pinned to validate; Liquibase (enabled at the base
+#                 application.yml level) owns the schema, Hibernate must never
+#                 mutate it.
 # =============================================================================
 spring:
   datasource:
@@ -11,6 +14,8 @@ spring:
       maximum-pool-size: 20
       connection-timeout: 5000
   jpa:
+    hibernate:
+      ddl-auto: validate
     properties:
       hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
       hibernate.jdbc.batch_size: 50
