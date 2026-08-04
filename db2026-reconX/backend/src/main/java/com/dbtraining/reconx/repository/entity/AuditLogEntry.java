@@ -1,7 +1,13 @@
 package com.dbtraining.reconx.repository.entity;
 
-import jakarta.persistence.*;
 import java.time.Instant;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 /**
  * TICKET-ADV132 / ADV137 — Append-only audit row written by AuditEventConsumer.
@@ -30,9 +36,8 @@ public class AuditLogEntry {
     @Column(length = 100)
     private String actor;
 
-    // No @Lob — Hibernate 6 + Postgres treats @Lob String as OID column,
-    // but Liquibase translates CLOB to TEXT. columnDefinition keeps both DBs
-    // happy (H2 accepts TEXT in Postgres mode, Postgres uses it natively).
+    // Use TEXT mapping so Hibernate validation matches the Liquibase schema
+    // for large state payloads in both H2 (Postgres mode) and Postgres.
     @Column(name = "before_state", columnDefinition = "TEXT")
     private String beforeState;
 

@@ -1,4 +1,4 @@
-# TICKET-ADV093 / ADV094 — Prometheus alert rules
+# DONE: TICKET-ADV093 / ADV094 — Prometheus alert rules
 groups:
   - name: reconx-business
     rules:
@@ -28,4 +28,4 @@ groups:
         labels:
           severity: critical
         annotations:
-          summary: "Messages landing in trade-events-dlq"
+          summary: "Messages landing in trade-events-dlq" 

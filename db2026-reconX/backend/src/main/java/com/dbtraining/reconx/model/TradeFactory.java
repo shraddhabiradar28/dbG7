@@ -26,13 +26,7 @@ public final class TradeFactory {
 
     private TradeFactory() { }
 
-    /**
-     * TODO(TICKET-ADV023):
-     *   1. Parse assetClass string into TradeType.AssetClass enum (toUpperCase first).
-     *   2. switch on the enum and dispatch to the matching equity/fx/bond/derivative
-     *      helper below.
-     *   3. The switch must be exhaustive — every TradeType.AssetClass case handled.
-     */
+    /** Parse the asset-class string and dispatch to the matching builder helper. */
     public static TradeType create(String assetClass, Map<String, Object> p) {
         TradeType.AssetClass ac = TradeType.AssetClass.valueOf(assetClass.toUpperCase());
         return switch (ac) {
@@ -41,13 +35,11 @@ public final class TradeFactory {
             case BOND       -> bond(p);
             case DERIVATIVE -> derivative(p);
         };
-        throw new UnsupportedOperationException("TICKET-ADV023");
     }
 
     /**
-     * TODO(TICKET-ADV023):
-     *   Build an EquityTrade from the map. Expected keys: tradeRef, symbol,
-     *   quantity, price, currency, side, tradeDate, counterpartyId.
+     * Build an EquityTrade from the map. Expected keys: tradeRef, symbol,
+     * quantity, price, currency, side, tradeDate, counterpartyId.
      */
     private static EquityTrade equity(Map<String, Object> p) {
         return EquityTrade.builder()
@@ -60,13 +52,11 @@ public final class TradeFactory {
                 .tradeDate(LocalDate.parse((String) p.get("tradeDate")))
                 .counterpartyId(((Number) p.get("counterpartyId")).longValue())
                 .build();
-        throw new UnsupportedOperationException("TICKET-ADV023");
     }
 
     /**
-     * TODO(TICKET-ADV023):
-     *   Build an FXTrade from the map. Expected keys: tradeRef, ccy1, ccy2,
-     *   notionalCcy1, fxRate, side, tradeDate, counterpartyId.
+     * Build an FXTrade from the map. Expected keys: tradeRef, ccy1, ccy2,
+     * notionalCcy1, fxRate, side, tradeDate, counterpartyId.
      */
     private static FXTrade fx(Map<String, Object> p) {
         return FXTrade.builder()
@@ -79,15 +69,13 @@ public final class TradeFactory {
                 .tradeDate(LocalDate.parse((String) p.get("tradeDate")))
                 .counterpartyId(((Number) p.get("counterpartyId")).longValue())
                 .build();
-        throw new UnsupportedOperationException("TICKET-ADV023");
 
     }
 
     /**
-     * TODO(TICKET-ADV023):
-     *   Build a BondTrade from the map. Expected keys: tradeRef, isin,
-     *   faceValue, couponRate, maturityDate, currency, side, tradeDate,
-     *   counterpartyId.
+     * Build a BondTrade from the map. Expected keys: tradeRef, isin,
+     * faceValue, couponRate, maturityDate, currency, side, tradeDate,
+     * counterpartyId.
      */
     private static BondTrade bond(Map<String, Object> p) {
         return BondTrade.builder()
@@ -101,14 +89,12 @@ public final class TradeFactory {
                 .tradeDate(LocalDate.parse((String) p.get("tradeDate")))
                 .counterpartyId(((Number) p.get("counterpartyId")).longValue())
                 .build();
-        throw new UnsupportedOperationException("TICKET-ADV023");
     }
 
     /**
-     * TODO(TICKET-ADV023):
-     *   Build a DerivativeTrade from the map. Expected keys: tradeRef,
-     *   underlying, strike, quantity, expiry, optionType, currency, side,
-     *   tradeDate, counterpartyId.
+     * Build a DerivativeTrade from the map. Expected keys: tradeRef,
+     * underlying, strike, quantity, expiry, optionType, currency, side,
+     * tradeDate, counterpartyId.
      */
     private static DerivativeTrade derivative(Map<String, Object> p) {
         return DerivativeTrade.builder()
@@ -123,7 +109,5 @@ public final class TradeFactory {
                 .tradeDate(LocalDate.parse((String) p.get("tradeDate")))
                 .counterpartyId(((Number) p.get("counterpartyId")).longValue())
                 .build();
-    }
-        throw new UnsupportedOperationException("TICKET-ADV023");
     }
 }
