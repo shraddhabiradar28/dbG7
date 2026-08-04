@@ -37,10 +37,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
 
-import java.net.URI;
-import java.time.LocalDate;
-import java.util.Map;
-
 /**
  * ============================================================================
  * TICKET-ADV063-ADV067 — TradeController (full CRUD + filterable list)

@@ -42,11 +42,16 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>com.dbtraining.reconx</groupId>
-            <artifactId>recon-audit-starter</artifactId>
-            <version>1.0.0</version>
-        </dependency>
+        <!-- NOTE: recon-audit-starter is deliberately NOT a dependency here.
+             It lives at the repo root, outside this module's Docker build
+             context (docker-compose.yml uses `build: ./backend`), and it is
+             not published to Maven Central — so declaring it made
+             `docker compose build backend` fail to resolve it. It only
+             appeared to work locally because a `mvn install` had left the jar
+             in ~/.m2. No backend source imports com.dbtraining.reconx.audit,
+             so nothing is lost by dropping it.
+             To wire it up properly later: move the compose build context to
+             the repo root and build both modules together. -->
 
         <!-- Web + Validation (ADV063-ADV071) -->
         <dependency>
