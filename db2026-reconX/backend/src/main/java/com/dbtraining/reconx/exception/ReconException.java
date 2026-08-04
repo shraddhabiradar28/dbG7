@@ -2,7 +2,7 @@ package com.dbtraining.reconx.exception;
 
 /**
  * ============================================================================
- * TICKET-ADV025 — Root of the exception hierarchy
+ * DONE: TICKET-ADV025 — Root of the exception hierarchy
  *
  * WHAT:    Abstract parent for every domain-level exception raised by the
  *          reconciliation service.
