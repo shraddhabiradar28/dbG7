@@ -12,14 +12,6 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnClass(ApplicationEventPublisher.class)
 @ConditionalOnProperty(prefix = "reconx.audit", name = "enabled", havingValue = "true", matchIfMissing = true)
 @EnableConfigurationProperties(AuditProperties.class)
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-
-@AutoConfiguration
-@EnableConfigurationProperties(AuditProperties.class)
-@ConditionalOnProperty(prefix = "reconx.audit", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class AuditAutoConfiguration {
 
     @Bean
@@ -27,9 +19,5 @@ public class AuditAutoConfiguration {
     public AuditEventPublisher auditEventPublisher(ApplicationEventPublisher publisher,
                                                     AuditProperties props) {
         return new AuditEventPublisher(publisher, props);
-    }
-}
-    public AuditEventPublisher auditEventPublisher(AuditProperties properties) {
-        return new AuditEventPublisher(properties);
     }
 }
