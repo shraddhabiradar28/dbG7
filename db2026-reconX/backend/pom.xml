@@ -140,11 +140,24 @@
             <artifactId>caffeine</artifactId>
         </dependency>
 
-        <!-- Swagger / OpenAPI (ADV058) -->
+        <!-- Swagger / OpenAPI (ADV058)
+             2.6.0 was built against Spring Framework 6.1 and threw
+             NoSuchMethodError on ControllerAdviceBean under Spring Boot 3.5 /
+             Framework 6.2, making /v3/api-docs return 500. 2.9.0 fixes that.
+
+             NOTE: this is the -api artifact, so there is no Swagger UI page —
+             ADV058 asks for /api/swagger-ui.html, which is NOT satisfied here.
+             The -ui artifact registers resource patterns
+             (/swagger-ui/**/*index.html) that Spring Framework 6.2's
+             PathPatternParser rejects at startup, and the documented
+             spring.mvc.pathmatch.matching-strategy=ant_path_matcher remedy no
+             longer applies to resource handlers in 6.2 — verified, the app
+             still fails to boot with it set. Getting the UI back needs a
+             springdoc/Spring Boot version alignment, not a config tweak. -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
-            <version>2.6.0</version>
+            <version>2.9.0</version>
         </dependency>
 
         <!-- MapStruct (ADV054) -->
