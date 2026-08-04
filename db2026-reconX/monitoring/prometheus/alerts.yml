@@ -1,4 +1,4 @@
-# TICKET-ADV093 / ADV094 — Prometheus alert rules
+# DONE: TICKET-ADV093 / ADV094 — Prometheus alert rules
 groups:
   - name: reconx-business
     rules:
@@ -22,10 +22,11 @@ groups:
         annotations:
           summary: "P95 request latency > 500ms for 3 min on {{ $labels.uri }}"
 
-      - alert: KafkaDlqGrowing
-        expr: increase(kafka_consumer_records_consumed_total{topic="trade-events-dlq"}[5m]) > 0
+      - alert: KafkaDlqMessages
+        expr: sum(kafka_consumer_records_consumed_total{topic="trade-events-dlq"}) > 0
         for: 1m
         labels:
           severity: critical
         annotations:
-          summary: "Messages landing in trade-events-dlq"
+          summary: "Messages in trade-events DLQ"
+          description: "Inspect /api/v1/admin/dlq for operator action."

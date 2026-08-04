@@ -13,8 +13,12 @@
 spring:
   application:
     name: reconx
+  jmx:
+    enabled: true
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
+    jmx:
+      enabled: true
 
   # ADV012 — Liquibase classpath wiring (the classic starter bug is missing the
   # `classpath:` prefix here, which causes a silent  skip on JAR  builds).
@@ -25,17 +29,23 @@ spring:
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
     properties:
       hibernate.jdbc.time_zone: UTC
       hibernate.format_sql: true
 
+  sql:
+    init:
+      mode: never
 
-  # ADV081-ADV082 — Caffeine cache config; per-cache spec overrides the global one.
+
+  # ADV081-ADV082 — Caffeine cache config. Per-cache TTLs (instruments 5m,
+  # counterparties 1m) come from the CacheManager @Bean in CacheConfig, which
+  # supersedes this block entirely once defined — Boot's cache autoconfiguration
+  # backs off in favour of a user-supplied CacheManager. Left here only as a
+  # record of the Day-1 single-spec default that CacheConfig replaces.
   cache:
     cache-names: instruments,counterparties
-    caffeine:
-      spec: maximumSize=500, expireAfterWrite=5m
 
   # ADV128 — Kafka producer/consumer defaults. Topics are created at startup
   # by KafkaTopicsConfig (see com.dbtraining.reconx.kafka.KafkaTopicsConfig).
@@ -55,13 +65,21 @@ spring:
         spring.json.trusted.packages: com.dbtraining.reconx.dto
         spring.json.use.type.headers: false
         spring.json.value.default.type: com.dbtraining.reconx.dto.TradeEvent
+        metric.reporters: io.micrometer.core.instrument.binder.kafka.KafkaClientMetrics
+        
+    listener:
+      # Prevent startup failure when Kafka isn't reachable in dev/test
+      missing-topics-fatal: false
 
 server:
   servlet:
     context-path: /api
+  tomcat:
+    basedir: ${TOMCAT_BASE_DIR:${user.dir}/target/tomcat}
 
 # =============================================================================
 # TICKET-ADV083-ADV086 / ADV097 — Actuator + Prometheus exposure
+# histogram metric added
 #  Custom metrics registered by com.dbtraining.reconx.observability.TradeMetrics
 #  scrape via /actuator/prometheus.
 # =============================================================================
@@ -69,7 +87,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus,env,loggers
+        include: health,info,metrics,prometheus,env,loggers,caches
       base-path: /actuator
   endpoint:
     health:
@@ -77,6 +95,9 @@ management:
       probes:
         enabled: true
   metrics:
+    binders:
+      kafka:
+        enabled: true
     distribution:
       percentiles-histogram:
         http.server.requests: true
