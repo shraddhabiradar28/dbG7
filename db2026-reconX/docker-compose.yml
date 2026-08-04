@@ -28,6 +28,11 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME:   2000
+    healthcheck:
+      test: ["CMD-SHELL", "cub zk-ready localhost:2181 5 || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     networks: [reconx]
 
   kafka:
@@ -81,6 +86,11 @@ services:
     depends_on:
       backend: {condition: service_healthy}
     ports: ["5173:80"]
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost/"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     networks: [reconx]
 
   prometheus:
@@ -90,6 +100,11 @@ services:
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ./monitoring/prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
     ports: ["9090:9090"]
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/healthy"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     networks: [reconx]
 
   grafana:
@@ -104,6 +119,11 @@ services:
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
       - grafana_data:/var/lib/grafana
     ports: ["3000:3000"]
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     networks: [reconx]
 
   # Optional — bring up with `--profile debug`
@@ -116,6 +136,11 @@ services:
       KAFKA_BROKERCONNECT: kafka:29092
       JVM_OPTS: "-Xms32M -Xmx64M"
     ports: ["9000:9000"]
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     networks: [reconx]
 
 networks:
