@@ -5,24 +5,6 @@ import java.time.LocalDate;
 import java.util.Currency;
 import java.util.Objects;
 
-/**
- * ============================================================================
- * TICKET-ADV019 — EquityTrade with Builder pattern
- *
- * WHAT:    Concrete TradeType for equity (cash share) trades.
- * HOW:     Final class, all fields final, no setters. Construction is via the
- *          nested {@link Builder} which validates in {@link Builder#build()}.
- * WHY:     Eight required fields on a single constructor is unreadable at
- *          the call site. Builder gives named arguments, makes the validity
- *          check a single chokepoint, and the object stays immutable.
- * OBSERVE: Calling build() with a missing required field throws
- *          IllegalStateException — verified by EquityTradeTest.
- * HINT:    Same shape applied to FXTrade/BondTrade/DerivativeTrade.
- * ============================================================================
- *
- * TICKET-ADV028 — equals/hashCode from tradeRef (Object methods on a regular class)
- * TICKET-ADV030 — toString() omits PII, prints reference/symbol/qty/price/side
- */
 public final class EquityTrade implements TradeType {
 
     private final TradeRef tradeRef;
@@ -50,6 +32,7 @@ public final class EquityTrade implements TradeType {
     @Override public TradeRef tradeRef()    { return tradeRef; }
     @Override public LocalDate tradeDate()  { return tradeDate; }
     @Override public AssetClass assetClass(){ return AssetClass.EQUITY; }
+    @Override public Money notional()       { return new Money(quantity.multiply(price), currency); }
 
     /** Notional = quantity * price in the trade currency. */
     @Override public Money notional() {
@@ -107,6 +90,30 @@ public final class EquityTrade implements TradeType {
         public Builder counterpartyId(long v)         { this.counterpartyId = v;  return this; }
 
         public EquityTrade build() {
+            Objects.requireNonNull(tradeRef,         "tradeRef");
+            Objects.requireNonNull(instrumentSymbol, "instrumentSymbol");
+            Objects.requireNonNull(quantity,         "quantity");
+            Objects.requireNonNull(price,            "price");
+            Objects.requireNonNull(currency,         "currency");
+            Objects.requireNonNull(side,             "side");
+            Objects.requireNonNull(tradeDate,        "tradeDate");
+            if (quantity.signum() <= 0) throw new IllegalStateException("quantity must be > 0");
+            if (price.signum() <= 0)    throw new IllegalStateException("price must be > 0");
+            return new EquityTrade(this);
+            // TODO(TICKET-ADV019):
+            //   - Objects.requireNonNull each required field (tradeRef, instrumentSymbol,
+            //     quantity, price, currency, side, tradeDate).
+            //   - quantity and price must be > 0 (IllegalStateException otherwise).
+            //   - return new EquityTrade(this).
+
+            Objects.requireNonNull(tradeRef);
+            Objects.requireNonNull(instrumentSymbol);
+            Objects.requireNonNull(quantity);
+            Objects.requireNonNull(price);
+             Objects.requireNonNull(currency);
+            Objects.requireNonNull(side);
+            Objects.requireNonNull(tradeDate);
+            if(quantity.compareTo(BigDecimal.ZERO)<=0){
             Objects.requireNonNull(tradeRef, "tradeRef");
             Objects.requireNonNull(instrumentSymbol, "instrumentSymbol");
             Objects.requireNonNull(quantity, "quantity");
